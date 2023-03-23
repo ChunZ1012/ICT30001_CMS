@@ -1,0 +1,1 @@
+<div id="<?= $id; ?>" data-id="<?= $data_id; ?>" class="list-group-item nested-2 mb-1"><span><?= $title; ?></span><?php if(!empty($chidren)){ echo view('templates/menu_list', $children); } ?> </div>

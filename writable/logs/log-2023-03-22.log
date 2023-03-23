@@ -1,0 +1,164 @@
+ERROR - 2023-03-22 01:32:12 --> mysqli_sql_exception: Duplicate entry 'admin@admin.com' for key 'email' in D:\Swinburne\ICT30001\Backend\system\Database\MySQLi\Connection.php:295
+Stack trace:
+#0 D:\Swinburne\ICT30001\Backend\system\Database\MySQLi\Connection.php(295): mysqli->query('INSERT INTO `us...', 0)
+#1 D:\Swinburne\ICT30001\Backend\system\Database\BaseConnection.php(691): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `us...')
+#2 D:\Swinburne\ICT30001\Backend\system\Database\BaseConnection.php(605): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `us...')
+#3 D:\Swinburne\ICT30001\Backend\system\Database\BaseBuilder.php(2309): CodeIgniter\Database\BaseConnection->query('INSERT INTO `us...', Array, false)
+#4 D:\Swinburne\ICT30001\Backend\app\Database\Seeds\DefaultUserSeeder.php(20): CodeIgniter\Database\BaseBuilder->insert(Array)
+#5 D:\Swinburne\ICT30001\Backend\system\Database\Seeder.php(146): App\Database\Seeds\DefaultUserSeeder->run()
+#6 D:\Swinburne\ICT30001\Backend\system\Commands\Database\Seed.php(77): CodeIgniter\Database\Seeder->call('App\\Database\\Se...')
+#7 D:\Swinburne\ICT30001\Backend\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\Seed->run(Array)
+#8 D:\Swinburne\ICT30001\Backend\system\CLI\Console.php(37): CodeIgniter\CLI\Commands->run('db:seed', Array)
+#9 D:\Swinburne\ICT30001\Backend\spark(97): CodeIgniter\CLI\Console->run()
+#10 {main}
+INFO - 2023-03-22 13:56:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 13:56:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 13:56:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 13:56:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 13:56:54 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 13:56:54 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 13:56:55 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 13:56:55 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 13:56:55 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 13:56:55 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 13:56:56 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 13:57:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 13:57:18 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 13:57:18 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 13:57:19 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 13:57:19 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 13:57:19 --> REDIRECTED ROUTE at api/publish
+CRITICAL - 2023-03-22 13:57:19 --> Invalid file: "pages/publication/publication_category_list.php"
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 33.
+ 1 SYSTEMPATH\View\View.php(201): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('pages/publication/publication_category_list.php')
+ 2 SYSTEMPATH\Common.php(1184): CodeIgniter\View\View->render('pages/publication/publication_category_list', [], true)
+ 3 APPPATH\Controllers\Pages\PublicationCategoryController.php(22): view('pages/publication/publication_category_list')
+ 4 SYSTEMPATH\CodeIgniter.php(934): App\Controllers\Pages\PublicationCategoryController->list()
+ 5 SYSTEMPATH\CodeIgniter.php(499): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Pages\PublicationCategoryController))
+ 6 SYSTEMPATH\CodeIgniter.php(368): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 FCPATH\index.php(67): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('FCPATH\\index.php')
+INFO - 2023-03-22 13:57:20 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 13:57:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:00:35 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:02:38 --> REDIRECTED ROUTE at api/publish/category
+ERROR - 2023-03-22 14:02:38 --> mysqli_sql_exception: Unknown column 'publication_category.deleted_at' in 'where clause' in D:\Swinburne\ICT30001\Backend\system\Database\MySQLi\Connection.php:295
+Stack trace:
+#0 D:\Swinburne\ICT30001\Backend\system\Database\MySQLi\Connection.php(295): mysqli->query('SELECT `id`, `n...', 0)
+#1 D:\Swinburne\ICT30001\Backend\system\Database\BaseConnection.php(691): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `id`, `n...')
+#2 D:\Swinburne\ICT30001\Backend\system\Database\BaseConnection.php(605): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `id`, `n...')
+#3 D:\Swinburne\ICT30001\Backend\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT `id`, `n...', Array, false)
+#4 D:\Swinburne\ICT30001\Backend\system\Model.php(241): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\Swinburne\ICT30001\Backend\system\BaseModel.php(618): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\Swinburne\ICT30001\Backend\app\Controllers\API\PublicationCategoryAPIController.php(28): CodeIgniter\BaseModel->findAll()
+#7 D:\Swinburne\ICT30001\Backend\system\CodeIgniter.php(934): App\Controllers\API\PublicationCategoryAPIController->list()
+#8 D:\Swinburne\ICT30001\Backend\system\CodeIgniter.php(499): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\API\PublicationCategoryAPIController))
+#9 D:\Swinburne\ICT30001\Backend\system\CodeIgniter.php(368): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\Swinburne\ICT30001\Backend\public\index.php(67): CodeIgniter\CodeIgniter->run()
+#11 D:\Swinburne\ICT30001\Backend\system\Commands\Server\rewrite.php(47): require_once('D:\\Swinburne\\IC...')
+#12 {main}
+CRITICAL - 2023-03-22 14:02:38 --> Unknown column 'publication_category.deleted_at' in 'where clause'
+in SYSTEMPATH\Database\BaseConnection.php on line 645.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT `id`, `name`, `is_active`
+FROM `publication_category`
+WHERE `publication_category`.`deleted_at` IS NULL', [], false)
+ 2 SYSTEMPATH\Model.php(241): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(618): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\API\PublicationCategoryAPIController.php(28): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(934): App\Controllers\API\PublicationCategoryAPIController->list()
+ 6 SYSTEMPATH\CodeIgniter.php(499): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\API\PublicationCategoryAPIController))
+ 7 SYSTEMPATH\CodeIgniter.php(368): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 FCPATH\index.php(67): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('FCPATH\\index.php')
+INFO - 2023-03-22 14:02:39 --> REDIRECTED ROUTE at api/publish/category
+ERROR - 2023-03-22 14:02:39 --> mysqli_sql_exception: Unknown column 'publication_category.deleted_at' in 'where clause' in D:\Swinburne\ICT30001\Backend\system\Database\MySQLi\Connection.php:295
+Stack trace:
+#0 D:\Swinburne\ICT30001\Backend\system\Database\MySQLi\Connection.php(295): mysqli->query('SELECT `id`, `n...', 0)
+#1 D:\Swinburne\ICT30001\Backend\system\Database\BaseConnection.php(691): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `id`, `n...')
+#2 D:\Swinburne\ICT30001\Backend\system\Database\BaseConnection.php(605): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `id`, `n...')
+#3 D:\Swinburne\ICT30001\Backend\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT `id`, `n...', Array, false)
+#4 D:\Swinburne\ICT30001\Backend\system\Model.php(241): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\Swinburne\ICT30001\Backend\system\BaseModel.php(618): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\Swinburne\ICT30001\Backend\app\Controllers\API\PublicationCategoryAPIController.php(28): CodeIgniter\BaseModel->findAll()
+#7 D:\Swinburne\ICT30001\Backend\system\CodeIgniter.php(934): App\Controllers\API\PublicationCategoryAPIController->list()
+#8 D:\Swinburne\ICT30001\Backend\system\CodeIgniter.php(499): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\API\PublicationCategoryAPIController))
+#9 D:\Swinburne\ICT30001\Backend\system\CodeIgniter.php(368): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\Swinburne\ICT30001\Backend\public\index.php(67): CodeIgniter\CodeIgniter->run()
+#11 D:\Swinburne\ICT30001\Backend\system\Commands\Server\rewrite.php(47): require_once('D:\\Swinburne\\IC...')
+#12 {main}
+CRITICAL - 2023-03-22 14:02:39 --> Unknown column 'publication_category.deleted_at' in 'where clause'
+in SYSTEMPATH\Database\BaseConnection.php on line 645.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT `id`, `name`, `is_active`
+FROM `publication_category`
+WHERE `publication_category`.`deleted_at` IS NULL', [], false)
+ 2 SYSTEMPATH\Model.php(241): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(618): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\API\PublicationCategoryAPIController.php(28): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(934): App\Controllers\API\PublicationCategoryAPIController->list()
+ 6 SYSTEMPATH\CodeIgniter.php(499): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\API\PublicationCategoryAPIController))
+ 7 SYSTEMPATH\CodeIgniter.php(368): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 FCPATH\index.php(67): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Commands\Server\rewrite.php(47): require_once('FCPATH\\index.php')
+INFO - 2023-03-22 14:02:59 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:03:12 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:05:26 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:07:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:07:46 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:07:46 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:07:47 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:07:47 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:07:47 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:07:48 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:08:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:08:21 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:08:21 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:08:22 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:08:22 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:08:22 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:08:22 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:08:23 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:08:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:14:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:15:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:15:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:15:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:15:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:15:43 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:19:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:19:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:19:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:24:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:24:09 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:24:09 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:24:09 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:24:10 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:24:10 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:24:10 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:24:11 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:25:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:25:25 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:25:26 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:25:26 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:25:26 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:25:26 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:25:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:25:27 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:25:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:25:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:26:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:26:05 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 14:26:05 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 14:26:06 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 14:26:06 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 14:26:06 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 14:26:07 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 14:26:07 --> REDIRECTED ROUTE at api/publish
+INFO - 2023-03-22 14:28:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2023-03-22 14:28:55 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:28:56 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:28:56 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:28:56 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:28:57 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:28:57 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:28:57 --> REDIRECTED ROUTE at api/publish/category
+INFO - 2023-03-22 14:28:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

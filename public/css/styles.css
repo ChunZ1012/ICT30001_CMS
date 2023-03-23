@@ -1,0 +1,9 @@
+.form-label:has(+ .form-control:required)::after {
+    content:' *';
+    color:red;
+}
+
+.form-label:has(+ .form-select:required)::after {
+    content:' *';
+    color:red;
+}

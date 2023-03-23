@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "gridjs": "^6.0.6",
+    "suneditor": "^2.44.3",
+    "sweetalert2": "^11.7.3"
+  }
+}

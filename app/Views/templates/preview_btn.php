@@ -1,0 +1,1 @@
+<a class="btn btn-primary ms-2 <?= isset($link) ? '' : 'disabled' ?>" type="button" <?= isset($link) ? (' href="'.$link.'" target="_blank"') : (''); ?>>Preview</a>
