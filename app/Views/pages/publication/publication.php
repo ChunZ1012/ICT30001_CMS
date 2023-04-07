@@ -145,11 +145,11 @@
                 contentType:false,
                 success: (r) => {
                     if(!r.error) {
-                        toastSuccess('Successfully added!')
+                        toastSuccess('Successfully added!');
                     }
                     else {
-                        toastError('Error when saving the publication information!')
-                        toastError(r.msg)
+                        toastError('Error when saving the publication information!');
+                        toastError(r.msg);
                     }
                 },
                 error:(e) => {

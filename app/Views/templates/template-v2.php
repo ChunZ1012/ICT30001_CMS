@@ -65,7 +65,7 @@
                     <div class="page-header pt-2 pb-0">
                         <h2 class="fw-bold"> <?= $title; ?></h2>
                     </div>
-                    <?= (is_null($description) || empty($description) ? "" : '<p class="lead">'.$description.'</p>'); ?>
+                    <?= (isset($description) || is_null($description) || empty($description) ? "" : '<p class="lead">'.$description.'</p>'); ?>
                     <hr>
                     <?= $content; ?>
                 </main>
@@ -90,7 +90,7 @@
     $(function() {
         $("#logout-btn").click(function(e) {
             e.preventDefault();
-            $key = '<?= session()->get('token_access_key'); ?>'
+            $key = '<?= session()->get('token_access_key'); ?>';
             $.post({
                 url: '<?= base_url('api/auth/logout') ?>',
                 headers: {

@@ -38,6 +38,10 @@ $routes->group('/', function($routes) {
     // Directly return the desired page to the browser [Treated as GET]
     $routes->get('login', 'Pages\PageController::login');
     $routes->get('menu', 'Pages\PageController::menu');
+    $routes->group('f', function($routes){
+        $routes->get('content/list/(:num)', 'Pages\FrontendPageController::list/$1');
+        // $routes->view('content/list', 'pages/frontend/content_list');
+    });
     // Content
     $routes->group('content', function($routes){
         $routes->get('', 'Pages\PostController::list');
@@ -73,10 +77,10 @@ $routes->group('api', function($routes) {
     // $routes->post('reset', 'API\AuthController::reset');
     $routes->get('content/', 'API\PostAPIController::list');
     $routes->get('content/list', 'API\PostAPIController::list');
+    $routes->get('content/(:num)', 'API\PostAPIController::get/$1');
     // Content 
     $routes->group('content', ['filter' => 'authFilter'], function($routes){
-        $routes->get('(:num)', 'API\PostAPIController::get/$1');
-        $routes->post('add', 'API\PostAPIController::add');
+        $routes->post('add', 'API\PostAPIController::update/-1');
         $routes->post('edit/(:num)', 'API\PostAPIController::update/$1');
         $routes->put('activate/(:num)', 'API\PostAPIController::set_post_status/$1/1');
         $routes->put('deactivate/(:num)', 'API\PostAPIController::set_post_status/$1/0');

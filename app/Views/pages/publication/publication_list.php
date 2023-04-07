@@ -123,7 +123,7 @@ function editPublication(id) {
 }
 
 function deletePublication(id) {
-    var c = window.confirm('Are you sure to delete this content?')
+    var c = window.confirm('Are you sure to delete this content?');
     if (c) {
         $(function() {
             $.ajax({
@@ -153,11 +153,10 @@ function deletePublication(id) {
 }
 
 function setPublicationStatus(id, cur_status) {
-    var c = cur_status == 1 ? 'deactivate' : 'activate'
+    var c = cur_status == 1 ? 'deactivate' : 'activate';
     var confirm = window.confirm('Are you sure to ' + c + ' this publication?');
 
     if (confirm) {
-        console.log($.cookie('<?= session()->get('token_access_key'); ?>'))
         $.ajax({
             method:'PUT',
             url: '<?= base_url('api/publish/'); ?>' + c + '/' + id,

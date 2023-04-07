@@ -153,13 +153,11 @@ class PublicationAPIController extends BaseController
                     'is_active' => $postData['pub-is-active'],
                     'cover' => ($this->uploads_path.$imgFileName),
                     'pdf' => ($this->uploads_path.$fileFileName),
-                    // TODO: Revert below changes
-                    // 'created_by' => get_user_id(session())
-                    'created_by' => 1
+                    'created_by' => get_user_id(session())
+                    // 'created_by' => 1
                 ];
                 // Insert data into db
                 $r = $this->pubModel->insert($d);
-                // TODO: Category the insertion error to different exception class
                 // Throw exception if the data are not inserted into db
                 if(!$r) throw new Exception('Error when adding the publication!');
                 // Set success response message

@@ -95,32 +95,26 @@ class Validation extends BaseConfig
     ];
 
     public array $content_upload = [
-        'title' => [
+        'page-title' => [
             'label' => 'Page Title',
             'rules' =>  [ 
                 'required',
                 'alpha_numeric_punct'
             ]
         ],
-        'published_time' => [
+        'page-publish-time' => [
             'label' => 'Page Publish Time',
             'rules' => [
                 'required',
                 'valid_date'
             ]
         ],
-        'is_active' => [
+        'page-is-active' => [
             'label' => 'Page Status',
             'rules' => [
                 'required'
             ]
         ],
-        'content' => [
-            'label' => 'Page Content',
-            'rules' => [
-                'string'
-            ]
-        ]
     ];
     public array $publish_edit = [
         'pub-title' => [

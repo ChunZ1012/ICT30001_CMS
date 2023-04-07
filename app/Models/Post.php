@@ -18,6 +18,7 @@ class Post extends Model
         'title',
         'content',
         'published_time',
+        'cover',
         'is_active',
         'created_by',
         'modified_by',

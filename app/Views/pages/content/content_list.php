@@ -111,7 +111,12 @@ function createDataReqObj() {
         headers:{
             'Authorization': $.cookie('token')
         },
-        then: r => r.msg.data.map(c => [c.id, c.title, c.published_time, c.is_active, null]),
+        then: r => {
+            if(r.error) throw new Error("An error happened while fetching the data");
+            else {
+                return r.data.map(c => [c.id, c.title, c.published_time, c.is_active, null])
+            }
+        },
         handle: (r) => {
             if (r.status == 200) return r.json();
             else return {
@@ -126,11 +131,14 @@ function editContent(id) {
 }
 
 function deleteContent(id) {
-    var c = window.confirm('Are you sure to delete this content?')
+    var c = window.confirm('Are you sure to delete this content?');
     if (c) {
         $(function() {
             $.ajax({
                 method:'DELETE',
+                headers: {
+                    'Authorization': 'Bearer ' + $.cookie('<?= session()->get('token_access_key') ?>')
+                },
                 url: '<?= base_url('api/content/delete/'); ?>' + id,
                 success:(r) => {
                     if(!r.error) toastSuccess('Successfully deleted!');
@@ -146,14 +154,14 @@ function deleteContent(id) {
                         $r = $.parseJSON(e.responseText);
                         toastError($r.msg);
                     }
-                },
+                }
             })
         });
     }
 }
 
 function setContentStatus(id, cur_status) {
-    var c = cur_status == 1 ? 'deactivate' : 'activate'
+    var c = cur_status == 1 ? 'deactivate' : 'activate';
     var confirm = window.confirm('Are you sure to ' + c + ' this content?');
 
     if (confirm) {

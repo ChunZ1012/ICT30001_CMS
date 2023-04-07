@@ -1,7 +1,11 @@
 <head>
     <!-- SunEditor -->
     <link href="/css/suneditor/suneditor.min.css" rel="stylesheet" />
+    <link href="/css/jQuery.filer/jquery.filer.css" rel="stylesheet" />
+
     <script src="/js/suneditor/suneditor.min.js"></script>
+    <script src="/js/content.js"></script>
+    <script src="/js/jQuery.filer/jquery.filer.min.js"></script>
 </head>
 
 
@@ -11,7 +15,7 @@
     {
         $postModel = new \App\Models\Post();
         $post = $postModel->select(
-            'id, title, date_format(published_time, "%Y-%m-%d") as published_time, is_active, content'
+            'id, title, date_format(published_time, "%Y-%m-%d") as published_time, is_active, content, cover'
         )->find($id);
 
         if(is_null($post)) 
@@ -28,7 +32,7 @@
 ?>
 
 <div class="row">
-    <form class="d-flex flex-column" id="page-form" method="post">
+    <form class="d-flex flex-column" id="page-form" method="post" enctype="multipart/form-data">
         <!-- Action buttons -->
         <div class="d-flex flex-row mb-1 ms-auto">
             <a href="<?= base_url('content/list'); ?>" type="submit" class="btn btn-danger ms-2">Cancel</a>
@@ -53,7 +57,7 @@
                 'class' => 'form-label',
                 'for' => 'page-publish-time'
             ]); ?>
-                <?= form_input('page-publish-time', isset($post) ? $post    ['published_time'] : '', [
+                <?= form_input('page-publish-time', isset($post) ? $post['published_time'] : '', [
                 'class' => 'form-control',
                 'id' => 'page-publish-time',
                 'required' => ''
@@ -79,6 +83,13 @@
             ]);
         ?>
         </div>
+        <!-- Page cover page pictures -->
+        <div class="mb-3">
+            <label for="c-image" class="form-label">Cover Image</label>
+            <button type="button" class="btn btn-outline-primary" id="btn-add-image" onclick="$('#page-cover').click();">Add Image</button>
+            <input type="file" class="d-none" id="page-cover" name="page-cover[]" class="form-control" accept="image/*" multiple/>
+            <div class="mt-3 preview-images-zone" id="preview-images-zone"></div>
+        </div>
         <!-- Page Content -->
         <div class="mb-3">
             <label for="wysiwyg-editor" class="form-label">Content</label>
@@ -88,6 +99,22 @@
 </div>
 
 <script type="text/javascript">
+<?php
+    if(isset($post))
+    {
+        $imgSrc = explode(',', $post['cover']);
+        foreach($imgSrc as $src)
+        {
+            if(!empty($src))
+            {
+?>
+addPreviewImage('<?= base_url($src) ?>');
+saveToDict(num - 1, '<?= base_url($src); ?>');
+<?php
+            }
+        }
+    }
+?>
 $(function() {
     $(document).keydown(function(e){
         if(e.ctrlKey && e.keyCode == 83) {
@@ -104,21 +131,16 @@ $(function() {
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
             ['fontColor', 'hiliteColor', 'textStyle'],
             ['removeFormat'],
-            '/', // Line break
+            '/',
             ['outdent', 'indent'],
             ['align', 'horizontalRule', 'list', 'lineHeight'],
-            ['table', 'link', 'image', 'video',
-                'audio' /** ,'math' */
-            ], // You must add the 'katex' library at options to use the 'math' plugin.
-            /** ['imageGallery'] */ // You must add the "imageGalleryUrl".
+            ['table', 'link', 'image', 'video', 'audio'],
             ['fullScreen', 'showBlocks', 'codeView'],
             ['preview', 'print'],
             ['save', 'template'],
         ],
         height: 'auto',
         width: 'auto',
-        // minHeight: '250px',
-        // maxHeight: '350px',
         charCounter: true
     });
     editor.setDefaultStyle('font-family:Arial;font-size:12px');
@@ -127,14 +149,16 @@ $(function() {
     // Submit listener
     $("form#page-form").submit(function(e) {
         e.preventDefault();
-        var data = {
-            "data": {
-                "page-title": $("#page-title").val(),
-                "page-publish-time": $("#page-publish-time").val(),
-                "page-is-active": $("#page-is-active").val(),
-                "page-content": editor.getContents(true)
-            }
-        }
+        
+        var fd = new FormData();
+        fd.append("page-title", $("#page-title").val());
+        fd.append("page-publish-time", $("#page-publish-time").val());
+        fd.append("page-is-active", $("#page-is-active").val());
+        fd.append("page-content", editor.getContents(true));
+        fd.append("page-cover-count", imgDict.length);
+        $.map(imgDict, function(f, idx){
+            fd.append("page-cover-" + idx, f.file);
+        });
 
         $.post({
             url: '<?= isset($post) ? base_url('api/content/edit/'.$post['id']) : base_url('api/content/add'); ?>',
@@ -142,8 +166,9 @@ $(function() {
                 'Authorization': 'Bearer ' + $.cookie('<?= session()->get('token_access_key') ?>')
             },
             dataType: 'json',
-            contentType:'application/json',
-            data: JSON.stringify(data),
+            contentType:false,
+            processData:false,
+            data: fd,
             success:(r) => {
                 if(!r.error) toastSuccess('Successfully saved!');
                 else {
@@ -154,6 +179,7 @@ $(function() {
             error:(e) => {
                 if(e.status == 401) toastError('Please login before continue');
                 else {
+                    console.log(e);
                     $r = $.parseJSON(e.responseText);
                     if($r.validate_error) {
                         $m = $.parseJSON($r.msg);

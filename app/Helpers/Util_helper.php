@@ -89,9 +89,9 @@
     {
         function delete_uploaded_file($filePath)
         {
-            $baseDir = getcwd().getenv('PUBLIC_UPLOAD_PATH');
-            $fileRealPath = $baseDir.$filePath;
-            if(file_exists($fileRealPath)) 
+            $baseDir = getcwd();
+            $fileRealPath = $baseDir.'\\'.$filePath;
+            if(file_exists($fileRealPath) && is_file($fileRealPath)) 
             {
                 unlink($fileRealPath);
                 log_message('info', $filePath.' has been removed');

@@ -3,38 +3,35 @@
 namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
-use CodeIgniter\Database\RawSql;
 
-class CreatePosts extends Migration
+class PostImageContent extends Migration
 {
-    private $table_name = "posts";
+    private $table_name = 'post_image_content';
     public function up()
     {
         $this->forge->addField([
             'id' => [
                 'type' => 'BIGINT',
                 'constraint' => 255,
-                'auto_increment' => true
+                'auto_increment' => true,
+                'unsigned' => true
             ],
-            'title' => [
-                'type' => 'nvarchar',
-                'constraint' => '64'
+            'post_id' => [
+                'type' => 'BIGINT',
+                'constraint' => 255
             ],
-            'content' => [
-                'type' => 'LONGTEXT'
-            ],
-            'published_time' => [
-                'type' => 'timestamp',
-                'default' => new RawSql('CURRENT_TIMESTAMP')
-            ],
-            'cover' => [
+            'path' => [
                 'type' => 'LONGTEXT',
                 'null' => true
             ],
-            'is_active' => [
-                'type' => 'BIT',
-                'constraint' => 1,
-                'default' => 1
+            'description' => [
+                'type' => 'varchar',
+                'constraint' => 128,
+                'null' => true
+            ],
+            'content' => [
+                'type' => 'LONGTEXT',
+                'null' => true
             ],
             'created_at' => [
                 'type'=> 'timestamp',
@@ -58,6 +55,7 @@ class CreatePosts extends Migration
         ]);
 
         $this->forge->addPrimaryKey('id');
+        $this->forge->addForeignKey('post_id', 'posts', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('created_by', 'users', 'id', 'CASCADE', 'RESTRICT');
         $this->forge->addForeignKey('modified_by', 'users', 'id', 'CASCADE', 'RESTRICT');
         $this->forge->createTable($this->table_name);
