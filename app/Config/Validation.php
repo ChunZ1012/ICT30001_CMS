@@ -88,8 +88,7 @@ class Validation extends BaseConfig
         'password' => [
             'label' => 'User Password',
             'rules' => [
-                'required',
-                'min_length[8]'
+                'required'
             ]
         ]
     ];
@@ -202,5 +201,122 @@ class Validation extends BaseConfig
                 'required',
             ]
         ]
+    ];
+
+    public array $staff_add = [
+        'staff-name' => [
+            'label' => 'staff name',
+            'rules' => [
+                'required',
+                'string'
+            ]
+        ],
+        'staff-age' => [
+            'label' => 'staff age',
+            'rules' => [
+                'required',
+                'less_than[100]',
+                'is_natural_no_zero',
+            ],
+            'errors' => [
+                'less_than' => 'The value input is invalid!',
+                'is_natural_no_zero' => 'Please enter a number greater than 0!',
+            ]
+        ],
+        'staff-gender' => [
+            'label' => 'staff gender',
+            'rules' => [
+                'required',
+                'in_list[M,F]'
+            ],
+            'errors' => [
+                'in_list' => 'The value {value} for {field} is not valid!'
+            ]
+        ],
+        'staff-contact' => [
+            'label' => 'staff contact',
+            'rules' => [
+                'required',
+                'max_length[12]'
+            ],
+            'errors' => [
+                'max_length' => 'The value {value} exceeds the maximum length of {param}!'
+            ]
+        ],
+        'staff-email' => [
+            'label' => 'staff email',
+            'rules' => [
+                'required',
+                'valid_email',
+                'is_unique[staffs.email]'
+            ],
+            'errors' => [
+                'valid_email' => 'The email entered is not a valid email!',
+                'is_unique' => 'The email is already existed in the system! Please use a different email!'
+            ]
+        ],
+        'staff-office-contact' => [
+            'label' => 'staff office contact',
+            'rules' => [
+                'required',
+                'exact_length[10]'
+            ],
+            'errors' => [
+                'exact_length' => 'Please enter exact {param} characters for {field}!'
+            ]
+        ],
+        'staff-office-fax' => [
+            'label' => 'staff office fax',
+            'rules' => [
+                'required',
+                'exact_length[10]'
+            ],
+            'errors' => [
+                'exact_length' => 'Please enter exact {param} characters for {field}!'
+            ]
+        ],
+    ];
+
+    public array $user_add = [
+        'user-email' => [
+            'label' => 'user email',
+            'rules' => [
+                'required',
+                'is_unique[users.email]',
+                'valid_email'
+            ],
+            'errors' => [
+                'is_unique' => 'This email address has been registered!',
+                'valid_email' => 'The email address is invalid!'
+            ]
+        ],
+        'user-display-name' => [
+            'label' => 'user display name',
+            'rules' => [
+                'required',
+            ]
+        ],
+        'user-password' => [
+            'label' => 'user password',
+            'rules' => [
+                'required',
+                'min_length[8]',
+                'alpha_numeric_punct'
+            ],
+            'errors' => [
+                'min_length' => 'The password must contain at least 8 characters!',
+                'alpha_numeric_punct' => 'The password must contain alphanumeric, and the special symbol (~!#$%&*-_+=|:.)'
+            ]
+        ],
+        'user-role' => [
+            'label' => 'user role',
+            'rules' => [
+                'required',
+                'in_list[1,2]'
+            ],
+            'errors' => [
+                'in_list' => 'The user role value is invalid!'
+            ]
+        ],
     ];
 }

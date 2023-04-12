@@ -21,10 +21,6 @@ class CreatePublication extends Migration
                 'type' => 'nvarchar',
                 'constraint' => '255',
             ],
-            'category' => [
-                'type' => 'varchar',
-                'constraint' => 10
-            ],
             'published_time' => [
                 'type' => 'timestamp',
                 'default' => new RawSql('CURRENT_TIMESTAMP')
@@ -63,7 +59,6 @@ class CreatePublication extends Migration
             ]
         ]);
         $this->forge->addPrimaryKey('id');
-        $this->forge->addForeignKey('category', 'pub_categories', 'shortcode', 'CASCADE', 'RESTRICT');
         $this->forge->addForeignKey('created_by', 'users', 'id', 'CASCADE', 'RESTRICT');
         $this->forge->addForeignKey('modified_by', 'users', 'id', 'CASCADE', 'RESTRICT');
         $this->forge->createTable($this->table_name, true);

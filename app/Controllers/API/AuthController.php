@@ -3,7 +3,7 @@
 namespace App\Controllers\API;
 
 use App\Controllers\BaseController;
-use App\Models\UserModel;
+use App\Models\User;
 use CodeIgniter\HTTP\Response;
 use Exception;
 use InvalidArgumentException;
@@ -14,7 +14,7 @@ class AuthController extends BaseController
     public function __construct()
     {
         parent::__construct();
-        $this->userModel = new UserModel();
+        $this->userModel = new User();
     }
     public function login()
     {
@@ -25,23 +25,24 @@ class AuthController extends BaseController
         try{
             // if the input is empty | the user submit empty credentials
             if(is_null($input) || empty($input))  throw new InvalidArgumentException("Please fill in the login credential!");
-            if(!$this->validate('user_login')) throw new InvalidArgumentException();
+            if(!$this->validate('user_login')) throw new InvalidArgumentException('Please fill in the login credential!');
             // Get keyed credentials
             $email = $input['email'];
             $password = $input['password'];
             // Search for the appropriate user
             $user = $this->userModel->where('email', $email)->first();
 
-            if(is_null($user)) throw new Exception("Invalid email or password!");
+            if(is_null($user)) throw new InvalidArgumentException("Invalid email or password!");
             // Password verify
             $pwd_verify = password_verify($password, $user['password']);
-            if(!$pwd_verify) throw new Exception("Invalid email or password!");
+            if(!$pwd_verify) throw new InvalidArgumentException("Invalid email or password!");
             // Generate jwt payload
             $payload = generate_jwt_token(['email' => $email]);
             // Set session
             session()->set([
                 'token' => $payload,
-                'id' => $user['id']
+                'id' => $user['id'],
+                'role' => $user['role']
             ]);
             // set token access key (if not exist)
             if(is_null(session()->get('token_access_key')))

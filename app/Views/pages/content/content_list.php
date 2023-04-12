@@ -102,6 +102,7 @@ function updateGrid() {
     grid.updateConfig({
         server: createDataReqObj()
     }).forceRender();
+    console.clear()
 }
 
 function createDataReqObj() {

@@ -4,9 +4,9 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreatePublishCategory extends Migration
+class CreateStaffs extends Migration
 {
-    private $table_name = 'publication_category';
+    private $table_name = 'staffs';
     public function up()
     {
         $this->forge->addField([
@@ -16,19 +16,41 @@ class CreatePublishCategory extends Migration
                 'unsigned' => true,
                 'auto_increment' => true
             ],
-            'shortcode' => [
+            'name' => [
+                'type' => 'nvarchar',
+                'constraint' => 160,
+                'null' => false
+            ],
+            'age' => [
+                'type' => 'INT',
+                'constraint' => 3,
+                'null' => false,
+                'unsigned' => true
+            ],
+            'gender' => [
+                'type' => 'varchar',
+                'constraint' => 1,
+                'null' => false
+            ],
+            'contact' => [
+                'type' => 'varchar',
+                'constraint' => 12,
+                'null' => true
+            ],
+            'email' => [
+                'type' => 'varchar',
+                'constraint' => 60,
+                'null' => true
+            ],
+            'office_contact' => [
                 'type' => 'varchar',
                 'constraint' => 10,
-                'unique' => true
+                'null' => true
             ],
-            'name' => [
+            'office_fax' => [
                 'type' => 'varchar',
-                'constraint' => '255'
-            ],
-            'is_active' => [
-                'type' => 'BIT',
-                'constraint' => 1,
-                'default' => 1
+                'constraint' => 10,
+                'null' => true
             ],
             'created_at' => [
                 'type'=> 'timestamp',
@@ -37,10 +59,6 @@ class CreatePublishCategory extends Migration
             'modified_at' => [
                 'type' => 'timestamp',
                 'null' => true,
-            ],
-            'deleted_at' => [
-                'type' => 'timestamp',
-                'null' => true
             ],
             'created_by' => [
                 'type' => 'BIGINT',
@@ -52,18 +70,17 @@ class CreatePublishCategory extends Migration
                 'constraint' => 255,
                 'unsigned' => true,
                 'null' => true
-            ],
+            ]
         ]);
 
         $this->forge->addPrimaryKey('id');
         $this->forge->addForeignKey('created_by', 'users', 'id', 'CASCADE', 'RESTRICT');
         $this->forge->addForeignKey('modified_by', 'users', 'id', 'CASCADE', 'RESTRICT');
-        $this->forge->createTable($this->table_name, true);
+        $this->forge->createTable($this->table_name);
     }
 
     public function down()
     {
-        // Drop table if exist
-        $this->forge->dropTable($this->table_name, true);
+        $this->forge->dropTable($this->table_name);
     }
 }

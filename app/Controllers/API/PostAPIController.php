@@ -4,6 +4,7 @@ namespace App\Controllers\API;
 
 use App\Controllers\BaseController;
 use App\Models\Post;
+use App\Models\PostImage;
 use CodeIgniter\Database\RawSql;
 use CodeIgniter\HTTP\Response;
 use CodeIgniter\Validation\Exceptions\ValidationException;
@@ -13,10 +14,12 @@ use InvalidArgumentException;
 class PostAPIController extends BaseController
 {
     private $postModel;
+    private $postImageModel;
     public function __construct()
     {
         parent::__construct();
         $this->postModel = new Post();
+        $this->postImageModel = new PostImage();
     }
     public function list()
     {
@@ -27,23 +30,26 @@ class PostAPIController extends BaseController
             $fromUnity = filter_var($this->request->getHeaderLine('X-Unity-Req'), FILTER_VALIDATE_BOOL);
             // Using RawSql to properly trigger the substring_index function
             $rawSql = new RawSql(
-                'id, title, date_format(published_time, \'%Y-%m-%d\') as published_time, is_active, substring_index(cover, \',\', 1) as cover'
+                'id, title, date_format(published_time, \'%Y-%m-%d\') as published_time, is_active'
             );
             
-            $posts = $this->postModel->select($rawSql)->findAll();
-            
-            $data = [];
-            foreach($posts as $d)
+            $posts = $this->postModel
+                ->select($rawSql)
+                ->get()
+                ->getResultArray($this->postModel->returnType);
+            if($fromUnity)
             {
-                $d['cover'] = isset($d['cover']) && !empty($d['cover']) ? base_url($d['cover']) : '';
-
-                array_push($data, $d);
+                // Use for loop to add images key to posts, `foreach` loop only allow to read/ modify the existing content
+                for($i = 0; $i < count($posts); $i++)
+                {
+                    $postImages = $this->postImageModel->getImages($posts[$i]['id'], 1);
+                    $posts[$i]['images'] = $postImages;
+                }
             }
 
-            array_pop($data);
             // print_r($data);
             $respData['msg'] = "";
-            $respData['data'] = $fromUnity ? json_encode($data) : $data;
+            $respData['data'] = $fromUnity ? json_encode($posts) : $posts;
         }
         catch(Exception $e)
         {
@@ -66,20 +72,6 @@ class PostAPIController extends BaseController
             $postData = $this->getFormData();
             if($id < 0)
             {
-                // Loop through each uploaded image to save into the public folder
-                foreach($postData['page-covers'] as $c)
-                {
-                    // Save covers to public folder
-                    if(!is_null($c) && !$c->hasMoved() && $c->isValid()) 
-                    {
-                        $imgRndName = write_file_to_public($c);
-                        if(!isset($postData['page-cover'])) $postData['page-cover'] = '';
-                        $postData['page-cover'] .= $this->uploads_path.$imgRndName.',';
-                    }
-                }
-                // Remove trailing comma
-                if(isset($postData['page-cover'])) $postData['page-cover'] = substr($postData['page-cover'] , 0, strlen($postData['page-cover']) - 1);
-
                 $data = [
                     'title' => $postData['page-title'],
                     'published_time' => $postData['page-publish-time'],
@@ -87,14 +79,35 @@ class PostAPIController extends BaseController
                     'content' => $postData['page-content'],
                     'created_by' => get_user_id(session())
                 ];
-                // Set cover data to post data
-                if(isset($postData['page-cover'])) $data['cover'] = $postData['page-cover'];
                 // validated, trying to update the data in db
                 $r = $this->postModel->insert($data);
                 if(!$r) throw new Exception('Error when updating the content info!');
                 // Update successfully
-                // Set success response message
-                else $respData['msg'] = 'Successfully updated!';
+                else 
+                {
+                    $id = $this->postModel->getInsertID();
+                    // Loop through each uploaded image to save into the public folder
+                    foreach($postData['page-images'] as $c)
+                    {
+                        $image = $c['page-image'];
+                        // Save covers to public folder
+                        if(!is_null($image) && !$image->hasMoved() && $image->isValid()) 
+                        {
+                            $imgRndName = write_file_to_public($image);
+                            $postImageData = [
+                                'post_id' => $id,
+                                'path' => $imgRndName,
+                                'description' => $c['page-image-alt-text'],
+                                'content' => $c['page-image-content'],
+                                'created_by' => get_user_id(session())
+                            ];
+                            $r = $this->postImageModel->insert($postImageData);
+                            log_message('debug', 'is post image inserted? '.$r ? 'true, id: '.$this->postImageModel->getInsertID() : 'failed');
+                        }   
+                    }   
+
+                    $respData['msg'] = 'Successfully updated!';
+                }
             }
             // Edit/ update content
             else
@@ -102,45 +115,82 @@ class PostAPIController extends BaseController
                 $post = $this->postModel->find($id);
                 // Throw if not exist
                 if(is_null($post)) throw new Exception("The selected post is no longer exist!");
-                // Split cover's path
-                $postCovers = explode(',', $post['cover']);
-                // Loop through each uploaded image to save into the public folder
-                foreach($postData['page-covers'] as $c)
+                
+                $storedImages = $this->postImageModel
+                    ->select('path')
+                    ->where('post_id', $post['id'])
+                    ->get()
+                    // This method will return 2 dimentional array, thus array_map will be used to get 1d array
+                    ->getResultArray($this->postImageModel->returnType);
+                // Get the columns data into single dimension array 
+                $storedImages = array_map(function($v){
+                    return $v['path'];
+                }, $storedImages);
+
+                $uploadedImages = [];
+                // Extract page image from uploaded content
+                foreach($postData['page-images'] as $p) array_push($uploadedImages, $p['page-image']->getClientName());
+                // Loop through each stored cover, delete the cover if no longer exist in the form request
+                for($x = 0; $x < count($storedImages); $x++)
                 {
-                    // If the cover uploaded is already existed in db
-                    // then skip storing it
-                    if(in_array($c, $postCovers)) continue;
-                    // If the cover uploaded is no longer inside the db
-                    // then store it
-                    else 
+                    $storedImage = $storedImages[$x];
+                    log_message('debug', 'storedImage: '.json_encode($storedImage));
+                    if(!in_array($storedImage, $uploadedImages)) 
                     {
-                        if(!is_null($c) && !$c->hasMoved() && $c->isValid()) 
-                        {
-                           $imgRndName = write_file_to_public($c);
-                           if(!isset($postData['page-cover'])) $postData['page-cover'] = '';
-                           $postData['page-cover'] .= $this->uploads_path.$imgRndName.',';
-                        }
+                        // Remove from local storage
+                        delete_uploaded_file($storedImage);
+                        // Remove image from db
+                        $this->postImageModel
+                            ->where('path', $storedImage)
+                            ->delete();
+                        // Remove from list
+                        array_splice($storedImages, $x, 1);
                     }
                 }
-                // Loop through each stored cover, delete the cover if no longer exist in
-                // the form request
-                foreach($postCovers as $c)
+                // Loop through each uploaded image to save into the public folder
+                foreach($postData['page-images'] as $coverMeta)
                 {
-                    if(!in_array($c, $postData['page-covers'])) delete_uploaded_file($c);
+                    $img = $coverMeta['page-image'];
+                    // log_message('debug', json_encode($coverMeta));
+                    $postImageData = [];
+                    // If the cover uploaded is already existed in db, update the description and content into database
+                    if(in_array($img->getClientName(), $storedImages)) $postImageData['modified_by'] = get_user_id(session());
+                    // If the cover uploaded is not inside the db, then store it
+                    else 
+                    {
+                        if(!is_null($img) && !$img->hasMoved() && $img->isValid()) 
+                        {
+                           $imgRndName = write_file_to_public($img);
+                           $postImageData['post_id'] = $post['id'];
+                           $postImageData['path'] = $imgRndName;
+                           $postImageData['created_by'] = get_user_id(session());
+                        }
+                    }
+                    $postImageData['description'] = $coverMeta['page-image-alt-text'];
+                    $postImageData['content'] = $coverMeta['page-image-content'];
+                    
+                    log_message('debug', json_encode($postImageData));
+                    // Get the image content id
+                    $imageId = $this->postImageModel
+                        ->select('id')
+                        ->where('path', $img->getClientName())
+                        ->first();
+                    log_message('debug', json_encode($imageId));
+                    // Update the content if ID found
+                    if(!is_null($imageId) && isset($imageId) && $imageId > 0) $this->postImageModel->update($imageId, $postImageData);
+                    // Insert the content into db if ID not found
+                    else $this->postImageModel->insert($postImageData);
                 }
-                // Remove trailing comma
-                if(isset($postData['page-cover'])) $postData['page-cover'] = substr($postData['page-cover'] , 0, strlen($postData['page-cover']) - 1);
                 // Store in array (for validation & storing to db purpose)
                 $data = [
                     'title' => $postData['page-title'],
                     'published_time' => $postData['page-publish-time'],
                     'is_active' => $postData['page-is-active'],
-                    'content' => $postData['page-content'],
-                    'cover' => $postData['page-cover'],
                     'modified_by' => get_user_id(session()),
                 ];
                 // validated, trying to update the data in db
-                $r = $this->postModel->update($id, $data);
+                // $r = $this->postModel->update($id, $data);
+                $r = true;
                 if(!$r) throw new Exception('Error when updating the content info!');
                 // Update successfully
                 // Set success response message
@@ -171,19 +221,34 @@ class PostAPIController extends BaseController
     public function getFormData()
     {
         $data = $this->request->getPost();
-        $covers = [];
+        $postMeta = [];
+        $coverData = [];
         // Throw error if the content(s) is/ are not valid
         if(is_null($data)) throw new InvalidArgumentException('Invalid request body!');
         // validate form data
-        if(!$this->validateRequest($data, 'content_upload')) throw new ValidationException  ();
+        if(!$this->validateRequest($data, 'content_upload')) throw new ValidationException();
         // If there is/ are any image(s) uploaded
         if($data['page-cover-count'] > 0)
         {
-            for($i = 0; $i < $data['page-cover-count']; $i++) array_push($covers,   $this->request->getFile('page-cover-'.$i));
+            for($i = 0; $i < $data['page-cover-count']; $i++) 
+            {
+                $coverMeta = json_decode($data['page-cover-meta-'.$i], true);
+                log_message('debug', json_encode($coverMeta));
+                $img = $this->request->getFile('page-cover-'.$i);
+                $coverMeta['page-image'] = $img;
+
+                array_push($coverData, $coverMeta);
+                log_message('debug', json_encode($coverMeta));
+            }
         }
-        $data['page-covers'] = $covers;
-        // return data
-        return $data;
+
+        $postMeta['page-title'] = $data['page-title'];
+        $postMeta['page-publish-time'] = $data['page-publish-time'];
+        $postMeta['page-is-active'] = $data['page-is-active'];
+        $postMeta['page-content'] = $data['page-content'];
+        $postMeta['page-images'] = $coverData;
+
+        return $postMeta;
     }
     public function delete($id)
     {
@@ -258,10 +323,17 @@ class PostAPIController extends BaseController
         try
         {
             $post = $this->postModel->where('id', $id)->first();
+            if(is_null($post)) throw new InvalidArgumentException('The selected post is no longer exist!');
+
             $fromUnity = filter_var($this->request->getHeaderLine('X-Unity-Req'), FILTER_VALIDATE_BOOL);
 
-            if(is_null($post)) throw new InvalidArgumentException('Cannot find the requested post!');
-            else $respData['data'] = $fromUnity ? json_encode($post) : $post;
+            if($fromUnity)
+            {
+                $postImages = $this->postImageModel->getImages($post['id']);
+                $post['images'] = $postImages;
+            }
+            // set return data
+            $respData['data'] = $fromUnity ? json_encode($post) : $post;
         }
         catch(InvalidArgumentException $e)
         {

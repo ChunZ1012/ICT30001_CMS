@@ -68,7 +68,7 @@ abstract class BaseController extends Controller
         }
         return $input;
     }
-    public function validateRequest($input, $rules, $messages =[]){
+    public function validateRequest($input, $rules, $rules_ignore = [], $messages =[]){
         $this->validator = Services::Validation();
         // If you replace the $rules array with the name of the group
         if (is_string($rules)) {
@@ -87,6 +87,14 @@ abstract class BaseController extends Controller
             }
     
             $rules = $validation->$rules;
+            if(isset($rules_ignore))
+            {
+                for($i = 0; $i < count($rules_ignore); $i++)
+                {
+                    $isKeyExist = array_key_exists($rules_ignore[$i], $rules);
+                    if($isKeyExist) array_splice($rules, $i, 1);
+                }
+            }
         }
         return $this->validator->setRules($rules, $messages)->run($input);
     } 

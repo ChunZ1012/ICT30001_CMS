@@ -38,20 +38,24 @@
                     <div class="collapse navbar-collapse" id="navbar-content">
                         <ul class="navbar-nav me-auto mb-1 mb-lg-0 d-lg-flex flex-lg-column">
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href='<?= base_url('/') ?>'>Home</a>
-                            </li>
-                            <!-- <li class="nav-item">
-                                <a class="nav-link" aria-current="page" href="<?= base_url('menu') ?>">Menu</a>
-                            </li> -->
-                            <li class="nav-item">
-                                <a class="nav-link" aria-current="page" href="<?= base_url('content/list') ?>">Content</a>
+                                <a class="nav-link active" href='<?= base_url('/') ?>'>Home</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" aria-current="page" href="<?= base_url('publish/list') ?>">Publication</a>
+                                <a class="nav-link" href="<?= base_url('content/list') ?>">Content</a>
                             </li>
-                            <!-- <li class="nav-item">
-                                <a class="nav-link" aria-current="page" href="<?= base_url('publish/category/list') ?>">Publication Category</a>
-                            </li> -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?= base_url('publish/list') ?>">Publication</a>
+                            </li>
+                            <?php if(get_user_role(session()) == '1')
+                            {
+                                echo '<li class="nav-item">
+                                <a class="nav-link" href="<?= base_url(\'staff/list\') ?>">Staff</a>
+                                </li>
+                                <li class="nav-item">
+                                <a class="nav-link" href="<?= base_url(\'user/list\') ?>">Users</a>
+                                </li>';
+                            }
+                            ?>
                             <li class="nav-item">
                                 <a id="logout-btn" href="#" class="nav-link"><i
                                 class="fa-solid fa-right-from-bracket me-2"></i>Logout</a>

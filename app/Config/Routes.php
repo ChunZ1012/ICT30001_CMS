@@ -65,6 +65,20 @@ $routes->group('/', function($routes) {
             $routes->get('edit/(:num)', 'Pages\PublicationCategoryController::edit/$1');
         });
     });
+    // Staff
+    $routes->group('staff', function($routes){
+        $routes->get('', 'Pages\StaffController::list');
+        $routes->get('list', 'Pages\StaffController::list');
+        $routes->get('add', 'Pages\StaffController::add');
+        $routes->get('edit/(:num)', 'Pages\StaffController::edit/$1');
+    });
+    // User
+    $routes->group('user', function($routes){
+        $routes->get('', 'Pages\UserController::list');
+        $routes->get('list', 'Pages\UserController::list');
+        $routes->get('add', 'Pages\UserController::add');
+        $routes->get('edit/(:num)', 'Pages\UserController::edit/$1');
+    });
 });
 // API
 $routes->group('api', function($routes) {
@@ -91,7 +105,7 @@ $routes->group('api', function($routes) {
     $routes->get('publish', 'API\PublicationAPIController::list', [ 'as' => 'publish_list' ]);
     // Redirect to publish
     $routes->addRedirect('publish/list', 'publish_list');
-    $routes->get('(:num)', 'API\PublicationAPIController::get/$1');
+    $routes->get('publish/(:num)', 'API\PublicationAPIController::get/$1');
     // Publication Category Listing
     $routes->get('publish/category', 'API\PublicationCategoryAPIController::list', [ 'as' => 'publish_category_list' ]);
     // Redirect to 'Publication Category Listing'
@@ -112,6 +126,28 @@ $routes->group('api', function($routes) {
             $routes->put('deactivate/(:num)', 'API\PublicationCategoryAPIController::set_cate_status/$1/0');
         });
     });
+
+    // Staff
+    $routes->get('staff/', 'API\StaffAPIController::list', [ 'as' => 'staff_list' ]);
+    $routes->addRedirect('staff/list', 'staff_list');
+    $routes->get('staff/(:num)', 'API\StaffAPIController::get/$1');
+    $routes->group('staff', ['filter' => 'authFilter'], function($routes){
+        $routes->post('add', 'API\StaffAPIController::update/-1');
+        $routes->put('edit/(:num)', 'API\StaffAPIController::update/$1');
+        $routes->delete('delete/(:num)', 'API\StaffAPIController::delete/$1');
+    });
+
+    // User 
+    $routes->get('user/', 'API\UserAPIController::list', [ 'as' => 'user_list' ]);
+    $routes->addRedirect('user/list', 'user_list');
+    $routes->get('user/(:num)', 'API\UserAPIController::get/$1');
+    $routes->group('user', ['filter' => 'authFilter'], function($routes){
+        $routes->post('add', 'API\UserAPIController::update/-1');
+        $routes->put('edit/(:num)', 'API\UserAPIController::update/$1');
+        $routes->delete('delete/(:num)', 'API\UserAPIController::delete/$1');
+        $routes->put('reset-password/(:num)', 'API\UserAPIController::reset_password/$1');
+    });
+
 });
 /*
  * --------------------------------------------------------------------

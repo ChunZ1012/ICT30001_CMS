@@ -55,7 +55,8 @@
 <!-- <form id="pub-form" class="d-flex flex-column" enctype="multipart/form-data" method="POST"> -->
 <?= form_open_multipart(base_url('api/publish/').(isset($pub) ? 'edit/'.$pub['id'] : 'add'), [
     'class' => 'd-flex flex-column',
-    'id' => 'pub-form'
+    'id' => 'pub-form',
+    'novalidate' => ''
 ]); ?>
     <!-- Action buttons -->
     <div class="d-flex flex-row mb-1 ms-auto">
@@ -74,6 +75,7 @@
             'id' => 'pub-title',
             'required' => ''
         ]); ?>
+        <div class="invalid-feedback"></div>
     </div>
     <!-- Publication publish time -->
     <div class="mb-3">
@@ -86,6 +88,7 @@
             'id' => 'pub-publish-time',
             'required' => ''
         ], "date"); ?>
+        <div class="invalid-feedback"></div>
     </div>
     <div class="mb-3">
         <?= form_label("Is Active", "", [
@@ -105,24 +108,27 @@
                 'required' => ''
             ]);
         ?>
+        <div class="invalid-feedback"></div>
     </div>
     <!-- Publication Cover -->
     <div class="mb-3">
         <label for="pub-cover" class="form-label">Choose Cover</label>
         <div class="d-flex flex-row">
-            <input type="file" class="form-control" name="pub-cover" accept="image/*" aria-describedby="pub-cover-help-text" <?= isset($pub) ? '' : 'required' ?>>
+            <input type="file" class="form-control" id="pub-cover" name="pub-cover" accept="image/*" aria-describedby="pub-cover-help-text" <?= isset($pub) ? '' : 'required' ?>>
             <?= isset($pub) ? view('templates/preview_btn', ['link' => $filePrefix.$pub['cover']]) : ''; ?>
         </div>
         <div id="pub-cover-help-text" class="form-text">Use this to upload the cover of publication</div>
+        <div class="invalid-feedback"></div>
     </div>
     <!-- Publication Content -->
     <div class="mb-3">
         <label for="pub-file" class="form-label">Choose file</label>
         <div class="d-flex flex-row">
-            <input type="file" class="form-control" name="pub-file" accept="application/pdf" aria-describedby="pub-file-help-text" <?= isset($pub) ? '' : 'required' ?>>
+            <input type="file" class="form-control" id="pub-file" name="pub-file" accept="application/pdf" aria-describedby="pub-file-help-text" <?= isset($pub) ? '' : 'required' ?>>
             <?= isset($pub) ? view('templates/preview_btn', ['link' => $filePrefix.$pub['pdf']]) : ''; ?>
         </div>
         <div id="pub-file-help-text" class="form-text">Use this to upload the pdf of the publication</div>
+        <div class="invalid-feedback"></div>
     </div>
 </form>
 
@@ -130,6 +136,7 @@
     $(function(){
         $("#pub-form").submit(function(e){
             e.preventDefault();
+            $(this).removeClass('was-validated');
 
             $form = $(this)[0];
             $fd = new FormData($form);
@@ -160,7 +167,10 @@
                             $m = $.parseJSON($r.msg);
                             $.each($m, function(k, v){
                                 toastError(v);
+                                $("#"+k+" ~ div.invalid-feedback").html(v);
                             });
+                            $("form#pub-form")[0].checkValidity();
+                            $("form#pub-form").addClass('was-validated');
                         }
                         else toastError($r.msg);
                     }

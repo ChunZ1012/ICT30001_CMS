@@ -55,6 +55,15 @@
         }
     }
 
+    if(!function_exists('get_user_role'))
+    {
+        function get_user_role($session)
+        {
+            if(is_null($session) || empty($session->get('role'))) return null;
+            else return $session->get('role');
+        }
+    }
+
     if(!function_exists('write_file_to_public'))
     {
         function write_file_to_public(UploadedFile $file)
@@ -75,7 +84,7 @@
             }
             catch(Exception $e)
             {
-                log_message("wrror", 'write_file_to_public: {msg}\n{trace}', [
+                log_message("error", 'write_file_to_public: {msg}\n{trace}', [
                     'msg' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);
@@ -89,7 +98,7 @@
     {
         function delete_uploaded_file($filePath)
         {
-            $baseDir = getcwd();
+            $baseDir = getcwd().'\\'.getenv("PUBLIC_UPLOAD_PATH");
             $fileRealPath = $baseDir.'\\'.$filePath;
             if(file_exists($fileRealPath) && is_file($fileRealPath)) 
             {

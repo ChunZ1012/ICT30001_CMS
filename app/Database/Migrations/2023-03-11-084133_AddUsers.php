@@ -3,6 +3,7 @@
 namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
+use CodeIgniter\Database\RawSql;
 
 class AddUsers extends Migration
 {
@@ -28,6 +29,11 @@ class AddUsers extends Migration
                 'type' => 'nvarchar',
                 'constraint' => 50
             ],
+            'role' => [
+                'type' => 'INT',
+                'constraint' => 2,
+                'default' => 1
+            ],
             'created_at' => [
                 'type' => 'timestamp',
                 'null' => true
@@ -35,6 +41,10 @@ class AddUsers extends Migration
             'modified_at' => [
                 'type' => 'timestamp',
                 'null' => true
+            ],
+            'deleted_at' => [
+                'type' => 'timestamp',
+                'default' => new RawSql("CURRENT_TIMESTAMP")
             ]
         ]);
 
