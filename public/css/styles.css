@@ -8,6 +8,11 @@
     color:red;
 }
 
+.form-label:has(+ div.input-group > input.form-control:required)::after {
+    content:' *';
+    color:red;
+}
+
 .preview-images-zone {
     width: 100%;
     border: 1px solid #ddd;

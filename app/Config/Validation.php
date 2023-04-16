@@ -98,7 +98,6 @@ class Validation extends BaseConfig
             'label' => 'Page Title',
             'rules' =>  [ 
                 'required',
-                'alpha_numeric_punct'
             ]
         ],
         'page-publish-time' => [
@@ -145,7 +144,6 @@ class Validation extends BaseConfig
             'label' => 'Publication Title',
             'rules' => [
                 'required',
-                'string'
             ]
         ],
         'pub-publish-time' => [

@@ -48,10 +48,10 @@ class PostImage extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getImages($post_id, $limit = PHP_INT_MAX)
+    public function getImages($post_id, $withContent = true, $limit = PHP_INT_MAX)
     {
         $rawSql = new RawSql(
-            'id, description, CONCAT(\''.base_url(getenv("PUBLIC_UPLOAD_PATH")).'\', path) as path, content'
+            'CONCAT(\''.base_url(getenv("PUBLIC_UPLOAD_PATH")).'\', path) as path '.($withContent ? ', id, description, content' : '')
         );
         $postImages = $this->select($rawSql)
             ->where('post_id', $post_id)

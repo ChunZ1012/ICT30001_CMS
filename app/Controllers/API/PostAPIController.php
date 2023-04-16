@@ -30,20 +30,23 @@ class PostAPIController extends BaseController
             $fromUnity = filter_var($this->request->getHeaderLine('X-Unity-Req'), FILTER_VALIDATE_BOOL);
             // Using RawSql to properly trigger the substring_index function
             $rawSql = new RawSql(
-                'id, title, date_format(published_time, \'%Y-%m-%d\') as published_time, is_active'
+                'id, title, date_format(published_time, \'%Y-%m-%d\') as published_time'. ($fromUnity ? '' : ', is_active')
             );
             
             $posts = $this->postModel
                 ->select($rawSql)
+                ->where($fromUnity ? 'is_active' : 'id >=', 1)
                 ->get()
                 ->getResultArray($this->postModel->returnType);
+
             if($fromUnity)
             {
                 // Use for loop to add images key to posts, `foreach` loop only allow to read/ modify the existing content
                 for($i = 0; $i < count($posts); $i++)
                 {
-                    $postImages = $this->postImageModel->getImages($posts[$i]['id'], 1);
-                    $posts[$i]['images'] = $postImages;
+                    $postImages = $this->postImageModel->getImages($posts[$i]['id'], false, 1);
+                    // Get the first image
+                    $posts[$i]['image'] = !is_null($postImages) && count($postImages) > 0 ? $postImages[0]['path'] : '';
                 }
             }
 
@@ -75,14 +78,14 @@ class PostAPIController extends BaseController
                 $data = [
                     'title' => $postData['page-title'],
                     'published_time' => $postData['page-publish-time'],
-                    'is_active' => $postData['page-is-active'],
-                    'content' => $postData['page-content'],
+                    'is_active' => $postData['page-is-active'] == '1',
+                    'content' => '<div>'.$postData['page-content'].'</div>',
                     'created_by' => get_user_id(session())
                 ];
                 // validated, trying to update the data in db
                 $r = $this->postModel->insert($data);
                 if(!$r) throw new Exception('Error when updating the content info!');
-                // Update successfully
+                // Insert successfully
                 else 
                 {
                     $id = $this->postModel->getInsertID();
@@ -98,11 +101,10 @@ class PostAPIController extends BaseController
                                 'post_id' => $id,
                                 'path' => $imgRndName,
                                 'description' => $c['page-image-alt-text'],
-                                'content' => $c['page-image-content'],
+                                'content' => '<div>'.$c['page-image-content'].'</div>',
                                 'created_by' => get_user_id(session())
                             ];
                             $r = $this->postImageModel->insert($postImageData);
-                            log_message('debug', 'is post image inserted? '.$r ? 'true, id: '.$this->postImageModel->getInsertID() : 'failed');
                         }   
                     }   
 
@@ -134,7 +136,6 @@ class PostAPIController extends BaseController
                 for($x = 0; $x < count($storedImages); $x++)
                 {
                     $storedImage = $storedImages[$x];
-                    log_message('debug', 'storedImage: '.json_encode($storedImage));
                     if(!in_array($storedImage, $uploadedImages)) 
                     {
                         // Remove from local storage
@@ -151,7 +152,6 @@ class PostAPIController extends BaseController
                 foreach($postData['page-images'] as $coverMeta)
                 {
                     $img = $coverMeta['page-image'];
-                    // log_message('debug', json_encode($coverMeta));
                     $postImageData = [];
                     // If the cover uploaded is already existed in db, update the description and content into database
                     if(in_array($img->getClientName(), $storedImages)) $postImageData['modified_by'] = get_user_id(session());
@@ -167,15 +167,14 @@ class PostAPIController extends BaseController
                         }
                     }
                     $postImageData['description'] = $coverMeta['page-image-alt-text'];
-                    $postImageData['content'] = $coverMeta['page-image-content'];
+                    $postImageData['content'] = '<div>'.$coverMeta['page-image-content'].'</div>';
                     
-                    log_message('debug', json_encode($postImageData));
                     // Get the image content id
                     $imageId = $this->postImageModel
                         ->select('id')
                         ->where('path', $img->getClientName())
                         ->first();
-                    log_message('debug', json_encode($imageId));
+                        
                     // Update the content if ID found
                     if(!is_null($imageId) && isset($imageId) && $imageId > 0) $this->postImageModel->update($imageId, $postImageData);
                     // Insert the content into db if ID not found
@@ -185,12 +184,12 @@ class PostAPIController extends BaseController
                 $data = [
                     'title' => $postData['page-title'],
                     'published_time' => $postData['page-publish-time'],
-                    'is_active' => $postData['page-is-active'],
+                    'content' => '<div>'.$postData['page-content'].'</div>',
+                    'is_active' => $postData['page-is-active'] == '1',
                     'modified_by' => get_user_id(session()),
                 ];
                 // validated, trying to update the data in db
-                // $r = $this->postModel->update($id, $data);
-                $r = true;
+                $r = $this->postModel->update($id, $data);
                 if(!$r) throw new Exception('Error when updating the content info!');
                 // Update successfully
                 // Set success response message
@@ -233,12 +232,10 @@ class PostAPIController extends BaseController
             for($i = 0; $i < $data['page-cover-count']; $i++) 
             {
                 $coverMeta = json_decode($data['page-cover-meta-'.$i], true);
-                log_message('debug', json_encode($coverMeta));
                 $img = $this->request->getFile('page-cover-'.$i);
                 $coverMeta['page-image'] = $img;
 
                 array_push($coverData, $coverMeta);
-                log_message('debug', json_encode($coverMeta));
             }
         }
 
@@ -322,14 +319,21 @@ class PostAPIController extends BaseController
         $respCode = Response::HTTP_OK;
         try
         {
-            $post = $this->postModel->where('id', $id)->first();
-            if(is_null($post)) throw new InvalidArgumentException('The selected post is no longer exist!');
-
             $fromUnity = filter_var($this->request->getHeaderLine('X-Unity-Req'), FILTER_VALIDATE_BOOL);
+
+            $post = $this->postModel
+                ->select(
+                    'title, date_format(published_time, \'%Y-%m-%d\') as published_time, content'.($fromUnity ? '' : ', is_active')
+                )
+                ->where('id', $id)
+                ->where($fromUnity ? 'is_active' : 'id >=', 1)
+                ->first();
+
+            if(is_null($post)) throw new InvalidArgumentException('The selected post is no longer exist!');
 
             if($fromUnity)
             {
-                $postImages = $this->postImageModel->getImages($post['id']);
+                $postImages = $this->postImageModel->getImages($id);
                 $post['images'] = $postImages;
             }
             // set return data

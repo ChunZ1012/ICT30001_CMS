@@ -5,7 +5,7 @@
     {
         $pubModel = new \App\Models\Publication();
         $pub = $pubModel->select(
-            'id, title, is_active, date_format(published_time, "%Y-%m-%d") as published_time, cover, pdf'
+            'id, title, is_active, date_format(published_time, "%Y-%m-%d") as published_time, CONCAT(\''.getenv("PUBLIC_UPLOAD_PATH").'\', cover) as cover, CONCAT(\''.getenv("PUBLIC_UPLOAD_PATH").'\', pdf) as pdf'
         )->find($id);
 
         if(is_null($pub)) 
@@ -141,6 +141,8 @@
             $form = $(this)[0];
             $fd = new FormData($form);
 
+            toastLoading();
+
             $.post({
                 url:'<?= base_url('api/publish/').(isset($pub) ? 'edit/'.$pub['id'] : 'add'); ?>',
                 headers: {
@@ -151,6 +153,7 @@
                 processData:false,
                 contentType:false,
                 success: (r) => {
+                    Swal.close()
                     if(!r.error) {
                         toastSuccess('Successfully added!');
                     }
@@ -160,6 +163,7 @@
                     }
                 },
                 error:(e) => {
+                    Swal.close()
                     if(e.status == 401) toastError('Please login before continue');
                     else {
                         $r = $.parseJSON(e.responseText);

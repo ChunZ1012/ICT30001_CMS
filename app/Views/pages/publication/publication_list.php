@@ -109,7 +109,7 @@ function createDataReqObj() {
     return {
         url: '<?= base_url('api/publish/list'); ?>',
         method: 'GET',
-        then: r => r.msg.data.map(c => [c.id, c.title, c.published_time, c.is_active, null]),
+        then: r => r.data.data.map(c => [c.id, c.title, c.published_time, c.is_active, null]),
         handle: (r) => {
             if (r.status == 200) return r.json();
             else return {

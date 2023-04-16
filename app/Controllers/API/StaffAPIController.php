@@ -46,7 +46,40 @@ class StaffAPIController extends BaseController
         // Return response
         return $this->getResponse($p, $respCode);
     }
+    public function get($id)
+    {
+        $respData = ['msg' => ''];
+        $respCode = Response::HTTP_OK;
 
+        try
+        {
+            $staff = $this->staffModel->select(
+                'id, name, gender, contact, email, office_contact, office_fax'
+            )->find($id);
+            // Throw if the staff information is not existed in the db
+            if(is_null($staff)) throw new InvalidArgumentException('The selected staff is no longer exist!');
+            
+            $fromUnity = filter_var($this->request->getHeaderLine('X-Unity-Req'), FILTER_VALIDATE_BOOL);
+
+            $respData['data'] = $fromUnity ? json_encode($staff) : $staff;
+        }
+        catch(InvalidArgumentException $e)
+        {
+            $respCode = Response::HTTP_BAD_REQUEST;
+            $respData['msg'] = $e->getMessage();
+        }
+        catch(Exception $e)
+        {
+            // Return 500 server error
+            $respCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+            $respData['msg'] = $e->getMessage();
+        }
+        // initialize response content
+        $p = ['error' => $respCode != Response::HTTP_OK];
+        foreach($respData as $k => $v) $p[$k] = $v;
+        // Return response
+        return $this->getResponse($p, $respCode);
+    }
     public function update($id)
     {
         $respData = [];

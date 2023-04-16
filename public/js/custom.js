@@ -34,3 +34,13 @@ function toastInfo(title) {
         title:title
     })
 }
+
+function toastLoading(title = '', desc = '') {
+    Swal.fire({
+        title: title == '' ? 'Loading' : title,
+        html: desc = '' ? 'Your request is processing.' : desc,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+}

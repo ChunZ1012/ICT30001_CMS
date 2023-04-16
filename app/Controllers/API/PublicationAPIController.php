@@ -4,6 +4,7 @@ namespace App\Controllers\API;
 
 use App\Controllers\BaseController;
 use App\Models\Publication;
+use CodeIgniter\Database\RawSql;
 use CodeIgniter\HTTP\Response;
 use CodeIgniter\Validation\Exceptions\ValidationException;
 use Exception;
@@ -23,14 +24,22 @@ class PublicationAPIController extends BaseController
         $respCode = Response::HTTP_OK;
         try
         {
-            $data = [
-                'data' => $this->pubModel->select(
-                    'id, title, is_active, date_format(published_time, "%Y-%m-%d") as published_time'
-                )->findAll(),
-                'total' => $this->pubModel->selectCount('id')->first()['id']
-            ];
+            $fromUnity = filter_var($this->request->getHeaderLine('X-Unity-Req'), FILTER_VALIDATE_BOOL);
 
-            $respData['msg'] = $data;
+            $data = $this->pubModel->select(
+                'id, title, is_active, date_format(published_time, "%Y-%m-%d") as published_time'
+            )
+            // Only returning active publication if the request is from unity
+            ->where($fromUnity ? 'is_active' : 'id >=' , 1)
+            ->findAll();
+
+            if(!$fromUnity)
+            {
+                $data['data'] = $data;
+                $data['total'] = $this->pubModel->selectCount('id')->first()['id'];
+            }
+
+            $respData['data'] = $fromUnity ? json_encode($data) : $data;
         }
         catch(Exception $e)
         {
@@ -50,13 +59,21 @@ class PublicationAPIController extends BaseController
 
         try
         {
-            $pub = $this->pubModel->select(
-                'id, title, category, cover, is_active, pdf, published_time'
-            )->where('id', $id)->first();
+            $fromUnity = filter_var($this->request->getHeaderLine('X-Unity-Req'), FILTER_VALIDATE_BOOL);
+
+            $rSql = new RawSql(
+                'id, title, category, is_active, CONCAT(\''.base_url(getenv("PUBLIC_UPLOAD_PATH")).'\', cover) as cover, CONCAT(\''.base_url(getenv("PUBLIC_UPLOAD_PATH")).'\', pdf) as pdf,  published_time'
+            );
+            $pub = $this->pubModel
+                ->select($rSql)
+                ->where('id', $id)
+                // Only return the publication detail if the post is active and requested from unity
+                ->where($fromUnity ? 'is_active' : 'id >=', 1)
+                ->first();
             // Throw if the id is not exist in db
             if(is_null($pub)) throw new InvalidArgumentException("The selected publication is no longer exist!");
             // Else return the correspinding data
-            $respData['msg'] = json_encode($pub);
+            $respData['msg'] = $fromUnity ? json_encode($pub) : $pub;
         }
         catch(InvalidArgumentException $e)
         {
@@ -106,7 +123,7 @@ class PublicationAPIController extends BaseController
                     // Remove uploaded cover
                     delete_uploaded_file($pub['cover']);
                     // Update cover path
-                    $pub['cover'] = $this->uploads_path.$imgRndName;
+                    $pub['cover'] = $imgRndName;
                 }
                 // Get pdf file from form data
                 $file = $this->request->getFile('pub-file');
@@ -117,8 +134,7 @@ class PublicationAPIController extends BaseController
                     // Remove uploaded pdf file
                     delete_uploaded_file($pub['pdf']);
                     // Update pdf file path
-                    $pub['pdf'] = $this->uploads_path.$fileRndName;
-                    log_message('debug', $this->uploads_path.$fileRndName);
+                    $pub['pdf'] = $fileRndName;
                 }
                 // Update object data
                 $pub['title'] = $postData['pub-title'];
@@ -139,11 +155,14 @@ class PublicationAPIController extends BaseController
                 // Validate input, and throw ValidationError if
                 // one of rule is not obeyed
                 if(!$this->validate('publish_add')) throw new ValidationException();
-                // Get cover file name
-                $imgFileName = write_file_to_public($img);
+                // Cover file name
+                $imgFileName = '';
                 // Get pdf file name
-                $fileFileName = write_file_to_public($file);
-
+                $fileFileName = '';
+                // Write cover file to public folder
+                if(!is_null($img) && !$img->hasMoved() && $img->isValid()) $imgFileName = write_file_to_public($img);
+                // Write file to public folder
+                if(!is_null($file) && !$file->hasMoved() && $file->isValid()) $fileFileName = write_file_to_public($file);
                 $d = [
                     'title' => $postData['pub-title'],
                     // TODO: Get category from form data
@@ -151,8 +170,8 @@ class PublicationAPIController extends BaseController
                     'category' => 'SC',
                     'published_time' => $postData['pub-publish-time'],
                     'is_active' => $postData['pub-is-active'],
-                    'cover' => ($this->uploads_path.$imgFileName),
-                    'pdf' => ($this->uploads_path.$fileFileName),
+                    'cover' => ($imgFileName),
+                    'pdf' => ($fileFileName),
                     'created_by' => get_user_id(session())
                     // 'created_by' => 1
                 ];
