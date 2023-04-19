@@ -28,7 +28,7 @@ class StaffAPIController extends BaseController
             $fromUnity = filter_var($this->request->getHeaderLine('X-Unity-Req'), FILTER_VALIDATE_BOOL);
 
             $staffs = $this->staffModel->select(
-                'id, name, contact, office_contact, office_fax'
+                'id, image, name, contact, email, position, location'
             )->findAll();
 
             $respData['msg'] = '';
@@ -54,7 +54,7 @@ class StaffAPIController extends BaseController
         try
         {
             $staff = $this->staffModel->select(
-                'id, name, gender, contact, email, office_contact, office_fax'
+                'id, image, name, contact, email, position, location'
             )->find($id);
             // Throw if the staff information is not existed in the db
             if(is_null($staff)) throw new InvalidArgumentException('The selected staff is no longer exist!');
@@ -97,13 +97,12 @@ class StaffAPIController extends BaseController
                 // one of rule is not obeyed
                 if(!$this->validate('staff_add')) throw new ValidationException();
                 $d = [
+                    'image' => $input['staff-image'],
                     'name' => $input['staff-name'],
-                    'age' => $input['staff-age'],
-                    'gender' => $input['staff-gender'],
                     'contact' => $input['staff-contact'],
                     'email' => $input['staff-email'],
-                    'office_contact' => $input['staff-office-contact'],
-                    'office_fax' => $input['staff-office-fax'],
+                    'position' => $input['staff-position'],
+                    'location' => $input['staff-location'],
                     'created_by' => get_user_id(session())
                 ];
                 // Insert data into db
@@ -124,12 +123,12 @@ class StaffAPIController extends BaseController
                 // Validate input, and throw ValidationError if one of rule is not obeyed
                 if(!$this->validateRequest($input, 'staff_add', $rules_ignore)) throw new ValidationException();
                 $d = [
+                    'image' => $input['staff-image'],
                     'name' => $input['staff-name'],
-                    'age' => $input['staff-age'],
-                    'gender' => $input['staff-gender'],
                     'contact' => $input['staff-contact'],
-                    'office_contact' => $input['staff-office-contact'],
-                    'office_fax' => $input['staff-office-fax'],
+                    'email' => $input['staff-email'],
+                    'position' => $input['staff-position'],
+                    'location' => $input['staff-location'],
                     'modified_by' => get_user_id(session())
                 ];
 

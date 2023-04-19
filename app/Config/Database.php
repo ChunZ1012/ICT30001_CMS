@@ -27,9 +27,9 @@ class Database extends Config
     public array $default = [
         'DSN'         => '',
         'hostname'    => 'localhost',
-        'username'    => 'sa',
-        'password'    => 'Born2Code',
-        'database'    => 'ict30001_backend',
+        'username'    => 'sd',
+        'password'    => 'sad2sad',
+        'database'    => 'staff',
         'DBDriver'    => 'MySQLi',
         'DBPrefix'    => '', 
         'pConnect'    => false,
