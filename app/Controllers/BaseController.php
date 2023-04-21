@@ -87,14 +87,20 @@ abstract class BaseController extends Controller
             }
     
             $rules = $validation->$rules;
-            if(isset($rules_ignore))
+            if(isset($rules_ignore) && count($rules_ignore) > 0)
             {
                 for($i = 0; $i < count($rules_ignore); $i++)
                 {
                     $isKeyExist = array_key_exists($rules_ignore[$i], $rules);
-                    if($isKeyExist) array_splice($rules, $i, 1);
+                    if($isKeyExist) 
+                    {
+                        $index = array_search($rules_ignore[$i], array_keys($rules));
+                        array_splice($rules, $index, 1);
+                    }
                 }
             }
+
+            log_message('debug', json_encode($rules));
         }
         return $this->validator->setRules($rules, $messages)->run($input);
     } 

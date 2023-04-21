@@ -13,6 +13,10 @@
     color:red;
 }
 
+i[class^='fa-'], i[calss*='fa-'] {
+    cursor: pointer;
+}
+
 .preview-images-zone {
     width: 100%;
     border: 1px solid #ddd;

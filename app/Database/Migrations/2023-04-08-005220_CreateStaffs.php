@@ -32,6 +32,11 @@ class CreateStaffs extends Migration
                 'constraint' => 1,
                 'null' => false
             ],
+            'avatar' => [
+                'type' => 'varchar',
+                'constraint' => 48,
+                'null' => true
+            ],
             'contact' => [
                 'type' => 'varchar',
                 'constraint' => 12,

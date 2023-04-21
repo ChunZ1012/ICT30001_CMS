@@ -49,10 +49,10 @@
                             <?php if(get_user_role(session()) == '1')
                             {
                                 echo '<li class="nav-item">
-                                <a class="nav-link" href="<?= base_url(\'staff/list\') ?>">Staff</a>
+                                <a class="nav-link" href="'.base_url('staff/list').'">Staff</a>
                                 </li>
                                 <li class="nav-item">
-                                <a class="nav-link" href="<?= base_url(\'user/list\') ?>">Users</a>
+                                <a class="nav-link" href="'.base_url('user/list').'">Users</a>
                                 </li>';
                             }
                             ?>

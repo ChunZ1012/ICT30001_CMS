@@ -27,10 +27,11 @@ class PublicationAPIController extends BaseController
             $fromUnity = filter_var($this->request->getHeaderLine('X-Unity-Req'), FILTER_VALIDATE_BOOL);
 
             $data = $this->pubModel->select(
-                'id, title, is_active, date_format(published_time, "%Y-%m-%d") as published_time'
+                'publications.id, title, is_active, date_format(published_time, "%Y-%m-%d") as published_time, date_format(publications.created_at, "%Y-%m-%d") as created_at, display_name as created_by'
             )
+            ->join('users', 'users.id = publications.created_by')
             // Only returning active publication if the request is from unity
-            ->where($fromUnity ? 'is_active' : 'id >=' , 1)
+            ->where($fromUnity ? 'is_active' : 'publications.id >=' , 1)
             ->findAll();
 
             if(!$fromUnity)
@@ -119,9 +120,9 @@ class PublicationAPIController extends BaseController
                 // Write cover file to public folder
                 if(!is_null($img) && !$img->hasMoved() && $img->isValid()) 
                 {
-                    $imgRndName = write_file_to_public($img);
+                    $imgRndName = write_file_to_public($img, 'pubs');
                     // Remove uploaded cover
-                    delete_uploaded_file($pub['cover']);
+                    delete_uploaded_file($pub['cover'], 'pubs');
                     // Update cover path
                     $pub['cover'] = $imgRndName;
                 }
@@ -130,16 +131,17 @@ class PublicationAPIController extends BaseController
                 // Write cover file to public folder
                 if(!is_null($file) && !$file->hasMoved() && $file->isValid()) 
                 {
-                    $fileRndName = write_file_to_public($file);
+                    $fileRndName = write_file_to_public($file, 'pubs');
                     // Remove uploaded pdf file
-                    delete_uploaded_file($pub['pdf']);
+                    delete_uploaded_file($pub['pdf'], 'pubs');
                     // Update pdf file path
                     $pub['pdf'] = $fileRndName;
                 }
                 // Update object data
                 $pub['title'] = $postData['pub-title'];
                 $pub['published_time'] = $postData['pub-publish-time'];
-                $pub['is_active'] = $postData['pub-is-active'];
+                // Only admin has the role to set the active status
+                $pub['is_active'] = get_user_role(session()) == '1' ? $postData['pub-is-active'] : 0;
                 // Update the data into db
                 $r = $this->pubModel->update($id, $pub);
                 // TODO: Category the insertion error to different exception class
@@ -160,16 +162,16 @@ class PublicationAPIController extends BaseController
                 // Get pdf file name
                 $fileFileName = '';
                 // Write cover file to public folder
-                if(!is_null($img) && !$img->hasMoved() && $img->isValid()) $imgFileName = write_file_to_public($img);
+                if(!is_null($img) && !$img->hasMoved() && $img->isValid()) $imgFileName = write_file_to_public($img, 'pubs');
                 // Write file to public folder
-                if(!is_null($file) && !$file->hasMoved() && $file->isValid()) $fileFileName = write_file_to_public($file);
+                if(!is_null($file) && !$file->hasMoved() && $file->isValid()) $fileFileName = write_file_to_public($file, 'pubs');
                 $d = [
                     'title' => $postData['pub-title'],
                     // TODO: Get category from form data
                     // 'category' => $data['pub-category'],
                     'category' => 'SC',
                     'published_time' => $postData['pub-publish-time'],
-                    'is_active' => $postData['pub-is-active'],
+                    'is_active' => (get_user_role(session()) == '1' ? $postData['pub-is-active'] : 0),
                     'cover' => ($imgFileName),
                     'pdf' => ($fileFileName),
                     'created_by' => get_user_id(session())
@@ -216,18 +218,25 @@ class PublicationAPIController extends BaseController
             $pub = $this->pubModel->find($id);
             // Throw error if the id is not exist in the db
             if(is_null($pub)) throw new InvalidArgumentException("The selected publication is no longer exist!");
-            // Set the status
-            $data = [
-                'is_active' => $status == 1,
-                'modified_by' => get_user_id(session())
-            ];
-            // Update the status to db
-            $r = $this->pubModel->update($id, $data);
-            if($r)
+            // Check for user role
+            // If the user is not an admin then throw error
+            // Else continue the process
+            if(get_user_role(session()) == '1')
             {
-                $respData['msg'] = 'Successfully '.($status == 1 ? 'activated' : 'deactivated').'!';
+                // Set the status
+                $data = [
+                    'is_active' => $status == 1,
+                    'modified_by' => get_user_id(session())
+                ];
+                // Update the status to db
+                $r = $this->pubModel->update($id, $data);
+                if($r)
+                {
+                    $respData['msg'] = 'Successfully '.($status == 1 ? 'activated' : 'deactivated').'!';
+                }
+                else throw new Exception('Error when '.($status == 1 ? 'activated' : 'deactivated').' the new publication!');
             }
-            else throw new Exception('Error when '.($status == 1 ? 'activated' : 'deactivated').' the new publication!');
+            else throw new InvalidArgumentException('You do not have permission to update the publication status!');
         }
         catch(InvalidArgumentException $e)
         {
@@ -255,18 +264,24 @@ class PublicationAPIController extends BaseController
         {
             $pub = $this->pubModel->find($id);
             if(is_null($pub)) throw new InvalidArgumentException("The selected publication is no longer exist!");
-
-            $r = $this->pubModel->delete($id);
-            if($r)
+            // Check for user role
+            // If the user is not an admin then throw error
+            // Else continue the process
+            if(get_user_role(session()) == '1')
             {
-                // Remove uploaded cover
-                delete_uploaded_file($pub['cover']);
-                // Remove uploaded pdf file
-                delete_uploaded_file($pub['pdf']);
-                // Set response message
-                $respData['msg'] = 'Successfully deleted!';
+                $r = $this->pubModel->delete($id);
+                if($r)
+                {
+                    // Remove uploaded cover
+                    delete_uploaded_file($pub['cover'], 'pubs');
+                    // Remove uploaded pdf file
+                    delete_uploaded_file($pub['pdf'], 'pubs');
+                    // Set response message
+                    $respData['msg'] = 'Successfully deleted!';
+                }
+                else throw new Exception('Error when deleting the new publication!');
             }
-            else throw new Exception('Error when deleting the new publication!');
+            else throw new InvalidArgumentException('You do not have permission to delete the publication!');
         }
         catch(InvalidArgumentException $e)
         {

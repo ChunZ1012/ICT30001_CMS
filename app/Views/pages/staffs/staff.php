@@ -1,17 +1,18 @@
 <?php
+$filePrefix = base_url();
 $is_edit = isset($id) && $id > 0;
 if ($is_edit) {
     $staffModel = new \App\Models\Staff();
     $post = $staffModel->select(
-        'id, name, contact, email, age, gender, office_contact, office_fax'
+        'id, name, contact, CONCAT(\''.getenv("PUBLIC_UPLOAD_PATH").'avatars/\', avatar) as avatar, email, age, gender, office_contact, office_fax'
     )->find($id);
 
     if (is_null($post)) {
         ?>
 <!-- Stop render and going back to list -->
 <script type="text/javascript">
-    alert('The selected staff is no longer exist!');
-    window.location.href = '<?=base_url('staff/list');?>';
+alert('The selected staff is no longer exist!');
+window.location.href = '<?=base_url('staff/list');?>';
 </script>
 <?php
 }
@@ -34,6 +35,7 @@ if ($is_edit) {
             <?= form_input('staff-name', isset($post) ? $post['name'] : '', [
                 'class' => 'form-control',
                 'id' => 'staff-name',
+                'name' => 'staff-name',
                 'required' => '',
             ], 'text');?>
             <div class="invalid-feedback"></div>
@@ -47,6 +49,7 @@ if ($is_edit) {
             <?=form_input('staff-age', isset($post) ? $post['age'] : '', [
                 'class' => 'form-control',
                 'id' => 'staff-age',
+                'name' => 'staff-age',
                 'pattern' => '[0-9]{2,3}',
                 'required' => '',
             ], 'number');?>
@@ -66,6 +69,17 @@ if ($is_edit) {
                 'id' => 'staff-gender',
                 'required' => '',
             ]); ?>
+            <div class="invalid-feedback"></div>
+        </div>
+        <!-- Publication Cover -->
+        <div class="mb-3">
+            <label for="staff-avatar" class="form-label">Choose Image</label>
+            <div class="d-flex flex-row">
+                <input type="file" class="form-control" id="staff-avatar" name="staff-avatar" accept="image/*"
+                    aria-describedby="staff-avatar-help-text" <?= isset($pub) ? '' : 'required' ?>>
+                <?= isset($post) && $is_edit ? view('templates/preview_btn', ['link' => $filePrefix.$post['avatar']]) : ''; ?>
+            </div>
+            <div id="staff-avatar-help-text" class="form-text">Use this to upload the image of staff</div>
             <div class="invalid-feedback"></div>
         </div>
         <!-- Staff Contact -->
@@ -130,8 +144,8 @@ if ($is_edit) {
 
 <script type="text/javascript">
 $(function() {
-    $(document).keydown(function(e){
-        if(e.ctrlKey && e.keyCode == 83) {
+    $(document).keydown(function(e) {
+        if (e.ctrlKey && e.keyCode == 83) {
             e.preventDefault();
             $("#staff-form").submit();
         }
@@ -142,46 +156,41 @@ $(function() {
         e.preventDefault();
         $(this).removeClass('was-validated');
 
-        $data = {
-            'staff-name': $("#staff-name").val(),
-            'staff-age': $("#staff-age").val(),
-            'staff-gender': $("#staff-gender").val(),
-            'staff-contact': $("#staff-contact").val(),
-            'staff-email': $("#staff-email").val(),
-            'staff-office-contact': $("#staff-office-contact").val(),
-            'staff-office-fax': $("#staff-office-fax").val(),
+        $fd = new FormData($(this)[0]);
+        for (var pair of $fd.entries()) {
+            console.log(pair[0]+ ', ' + pair[1]);
         }
-    
-        $.ajax({
-            method:'<?= isset($post) ? 'put' : 'post' ?>',
+        toastLoading();
+
+        $.post({
             url: '<?=isset($post) ? base_url('api/staff/edit/' . $post['id']) : base_url('api/staff/add');?>',
             headers: {
                 'Authorization': 'Bearer ' + $.cookie('<?=session()->get('token_access_key')?>')
             },
             dataType: 'json',
-            contentType:'application/json',
-            data: JSON.stringify($data),
-            success:(r) => {
-                if(!r.error) toastSuccess('Successfully saved!');
+            processData:false,
+            contentType:false,
+            data: $fd,
+            success: (r) => {
+                if (!r.error) toastSuccess('Successfully saved!');
                 else {
                     toastError('Error when saving the content!');
                     toastError(r.msg);
                 }
             },
-            error:(e) => {
-                if(e.status == 401) toastError('Please login before continue');
+            error: (e) => {
+                if (e.status == 401) toastError('Please login before continue');
                 else {
                     $r = $.parseJSON(e.responseText);
-                    if($r.validate_error) {
+                    if ($r.validate_error) {
                         $m = $.parseJSON($r.msg);
-                        $.each($m, function(k, v){
+                        $.each($m, function(k, v) {
                             toastError(v);
-                            $("#"+k+" ~ div.invalid-feedback").html(v);
+                            $("#" + k + " ~ div.invalid-feedback").html(v);
                         });
                         $("form#staff-form")[0].checkValidity();
                         $("form#staff-form").addClass('was-validated');
-                    }
-                    else toastError($r.msg);
+                    } else toastError($r.msg);
                 }
             },
         });

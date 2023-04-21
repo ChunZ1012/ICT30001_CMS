@@ -42,6 +42,14 @@ const grid = new gridjs.Grid({
             name: "Published Time"
         },
         {
+            id: 'pub-created-by',
+            name: "Created By"
+        },
+        {
+            id: 'pub-created-at',
+            name: "Created At"
+        },
+        {
             id: 'pub-is-active',
             name: "Is Active",
             formatter: (cell, row) => {
@@ -109,7 +117,7 @@ function createDataReqObj() {
     return {
         url: '<?= base_url('api/publish/list'); ?>',
         method: 'GET',
-        then: r => r.data.data.map(c => [c.id, c.title, c.published_time, c.is_active, null]),
+        then: r => r.data.data.map(c => [c.id, c.title, c.published_time, c.created_by, c.created_at, c.is_active, null]),
         handle: (r) => {
             if (r.status == 200) return r.json();
             else return {

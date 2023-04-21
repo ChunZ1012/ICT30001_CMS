@@ -5,7 +5,7 @@
     {
         $pubModel = new \App\Models\Publication();
         $pub = $pubModel->select(
-            'id, title, is_active, date_format(published_time, "%Y-%m-%d") as published_time, CONCAT(\''.getenv("PUBLIC_UPLOAD_PATH").'\', cover) as cover, CONCAT(\''.getenv("PUBLIC_UPLOAD_PATH").'\', pdf) as pdf'
+            'id, title, is_active, date_format(published_time, "%Y-%m-%d") as published_time, CONCAT(\''.getenv("PUBLIC_UPLOAD_PATH").'pubs/\', cover) as cover, CONCAT(\''.getenv("PUBLIC_UPLOAD_PATH").'pubs/\', pdf) as pdf'
         )->find($id);
 
         if(is_null($pub)) 
@@ -90,26 +90,21 @@
         ], "date"); ?>
         <div class="invalid-feedback"></div>
     </div>
-    <div class="mb-3">
-        <?= form_label("Is Active", "", [
-            'class' => 'form-label',
-            'for' => 'pub-is-active'
-        ]); ?>
-        <?= form_dropdown(
-            "pub-is-active", 
-            [
+<?php
+    if(get_user_role(session()) == 1)
+    {
+        echo view('templates/activation_select', [
+            'id' => 'pub-is-active',
+            'select_options' => [
                 1 => 'Active',
                 0 => 'Deactivate'
             ],
-            isset($pub) ? $pub['is_active'] : '', 
-            [
-                'class' => 'form-select',
-                'id' => 'pub-is-active',
-                'required' => ''
-            ]);
-        ?>
-        <div class="invalid-feedback"></div>
-    </div>
+            'active' => (isset($pub) ? $pub['is_active'] : 0),
+            'required' => true,
+            'comment' => '<!-- Publication Is Active -->'
+        ]);
+    }
+?>
     <!-- Publication Cover -->
     <div class="mb-3">
         <label for="pub-cover" class="form-label">Choose Cover</label>

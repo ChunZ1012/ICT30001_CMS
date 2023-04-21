@@ -54,7 +54,7 @@ class StaffAPIController extends BaseController
         try
         {
             $staff = $this->staffModel->select(
-                'id, name, gender, contact, email, office_contact, office_fax'
+                'id, name, gender, avatar, contact, email, office_contact, office_fax'
             )->find($id);
             // Throw if the staff information is not existed in the db
             if(is_null($staff)) throw new InvalidArgumentException('The selected staff is no longer exist!');
@@ -87,9 +87,9 @@ class StaffAPIController extends BaseController
         
         try
         {
-            $input = $this->request->getJSON(true);
-            // Throw if the request body is empty or not set
-            if(is_null($input) || empty($input)) throw new InvalidArgumentException("Please fill in all required fields!");
+            // Get image data
+            $avatar = $this->request->getFile('staff-avatar');
+            $input = $this->request->getPost();
             // User requests to add staff information
             if($id < 0)
             {
@@ -106,6 +106,13 @@ class StaffAPIController extends BaseController
                     'office_fax' => $input['staff-office-fax'],
                     'created_by' => get_user_id(session())
                 ];
+                // Try to save the image/ avatar to public assets folder
+                if(!is_null($avatar) && !$avatar->hasMoved() && $avatar->isValid()) 
+                {
+                    $rndName = write_file_to_public($avatar, 'avatars');
+                    $d['avatar'] = $rndName;
+                }
+
                 // Insert data into db
                 $r = $this->staffModel->insert($d);
                 // Throw exception if the data are not inserted into db                
@@ -123,6 +130,7 @@ class StaffAPIController extends BaseController
                 $rules_ignore = ['staff-email'];
                 // Validate input, and throw ValidationError if one of rule is not obeyed
                 if(!$this->validateRequest($input, 'staff_add', $rules_ignore)) throw new ValidationException();
+
                 $d = [
                     'name' => $input['staff-name'],
                     'age' => $input['staff-age'],
@@ -132,6 +140,15 @@ class StaffAPIController extends BaseController
                     'office_fax' => $input['staff-office-fax'],
                     'modified_by' => get_user_id(session())
                 ];
+
+                if(!is_null($avatar) && !$avatar->hasMoved() && $avatar->isValid()) 
+                {
+                    $rndName = write_file_to_public($avatar, 'avatars');
+                    // Remove uploaded avatar
+                    delete_uploaded_file($staff['avatar'], 'avatars');
+                    // Update avatar path
+                    $d['avatar'] = $rndName;
+                }
 
                 // Update data into db
                 $r = $this->staffModel->update($id, $d);

@@ -200,8 +200,7 @@ class PublicationCategoryAPIController extends BaseController
 
             $data = [
                 'is_active' => $status == 1,
-                // 'modified_by' => get_user_id($this->session)
-                'modified_by' => 1
+                'modified_by' => get_user_id(session())
             ];
 
             $r = $this->catModel->update($id, $data);

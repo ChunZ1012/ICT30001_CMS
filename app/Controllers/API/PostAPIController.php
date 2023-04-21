@@ -30,12 +30,13 @@ class PostAPIController extends BaseController
             $fromUnity = filter_var($this->request->getHeaderLine('X-Unity-Req'), FILTER_VALIDATE_BOOL);
             // Using RawSql to properly trigger the substring_index function
             $rawSql = new RawSql(
-                'id, title, date_format(published_time, \'%Y-%m-%d\') as published_time'. ($fromUnity ? '' : ', is_active')
+                'posts.id, title, date_format(published_time, \'%Y-%m-%d\') as published_time, display_name as created_by, date_format(posts.created_at, \'%Y-%m-%d\') as created_at'. ($fromUnity ? '' : ', is_active')
             );
             
             $posts = $this->postModel
                 ->select($rawSql)
-                ->where($fromUnity ? 'is_active' : 'id >=', 1)
+                ->join('users', 'users.id = posts.created_by')
+                ->where($fromUnity ? 'is_active' : 'posts.id >=', 1)
                 ->get()
                 ->getResultArray($this->postModel->returnType);
 
@@ -96,7 +97,7 @@ class PostAPIController extends BaseController
                         // Save covers to public folder
                         if(!is_null($image) && !$image->hasMoved() && $image->isValid()) 
                         {
-                            $imgRndName = write_file_to_public($image);
+                            $imgRndName = write_file_to_public($image, 'posts');
                             $postImageData = [
                                 'post_id' => $id,
                                 'path' => $imgRndName,
@@ -139,7 +140,7 @@ class PostAPIController extends BaseController
                     if(!in_array($storedImage, $uploadedImages)) 
                     {
                         // Remove from local storage
-                        delete_uploaded_file($storedImage);
+                        delete_uploaded_file($storedImage, 'posts');
                         // Remove image from db
                         $this->postImageModel
                             ->where('path', $storedImage)
@@ -160,7 +161,7 @@ class PostAPIController extends BaseController
                     {
                         if(!is_null($img) && !$img->hasMoved() && $img->isValid()) 
                         {
-                           $imgRndName = write_file_to_public($img);
+                           $imgRndName = write_file_to_public($img, 'posts');
                            $postImageData['post_id'] = $post['id'];
                            $postImageData['path'] = $imgRndName;
                            $postImageData['created_by'] = get_user_id(session());
@@ -255,12 +256,19 @@ class PostAPIController extends BaseController
         {
             $post = $this->postModel->find($id);
             if(is_null($post)) throw new InvalidArgumentException("The selected post is no longer exist!");
-            // Delete from db
-            $r = $this->postModel->delete($id);
-            if(!$r) throw new Exception('Error when deleting the content!');
-            // Update successfully
-            // Set success response message
-            else $respData['msg'] = 'Successfully deleted!';
+            // Check for user role
+            // If the user is not an admin then throw error
+            // Else continue the process
+            if(get_user_id(session()) == '1')
+            {
+                // Delete from db
+                $r = $this->postModel->delete($id);
+                if(!$r) throw new Exception('Error when deleting the content!');
+                // Update successfully
+                // Set success response message
+                else $respData['msg'] = 'Successfully deleted!';
+            }
+            else throw new InvalidArgumentException('You do not have permission to delete the content!');
         }
         catch(Exception $e)
         {
@@ -282,18 +290,23 @@ class PostAPIController extends BaseController
         {
             $post = $this->postModel->find($id);
             if(is_null($post)) throw new InvalidArgumentException("The selected post is no longer existed!");
-
-            $data = [
-                'is_active' => $status == 1,
-                // 'modified_by' => get_user_id($this->session)
-                'modified_by' => 1
-            ];
-
-            $r = $this->postModel->update($id, $data);
-            if(!$r) throw new Exception('Error when '.($status == 1 ? 'activating' : 'deactivating').' the selected post!');
-            // Update successfully
-            // Set success response message
-            else $respData['msg'] = 'Successfully '.($status == 1 ? 'Activated' : 'Deactivated').'!';
+            // Check for user role
+            // If the user is not an admin then throw error
+            // Else continue the process
+            if(get_user_role(session()) == '1')
+            {
+                $data = [
+                    'is_active' => $status == 1,
+                    'modified_by' => get_user_id(session())
+                ];
+    
+                $r = $this->postModel->update($id, $data);
+                if(!$r) throw new Exception('Error when '.($status == 1 ? 'activating' : 'deactivating').' the selected post!');
+                // Update successfully
+                // Set success response message
+                else $respData['msg'] = 'Successfully '.($status == 1 ? 'Activated' : 'Deactivated').'!';
+            }
+            else throw new InvalidArgumentException('You do not have permission to update the content status!');
         }
         catch(InvalidArgumentException $e)
         {

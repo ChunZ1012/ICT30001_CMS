@@ -24,6 +24,12 @@ class PageController extends BaseController
         return view('pages/login_page', $data);
     }
 
+    public function register()
+    {
+        // return view
+        return view('pages/register');
+    }
+
     public function home()
     {
         $data['brand'] = "CMS";

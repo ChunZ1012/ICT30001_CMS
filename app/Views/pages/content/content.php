@@ -68,26 +68,21 @@ if ($is_edit) {
 ], 'date');?>
             <div class="invalid-feedback"></div>
         </div>
-        <!-- Page Activation Status -->
-        <div class="mb-3">
-            <?=form_label("Is Active", "", [
-    'class' => 'form-label',
-    'for' => 'page-is-active',
-]);?>
-            <?=form_dropdown(
-    "page-is-active",
-    [
-        1 => 'Active',
-        0 => 'Deactivate',
-    ],
-    isset($post) ? $post['is_active'] : '',
-    [
-        'class' => 'form-select',
-        'id' => 'page-is-active',
-        'required' => '',
-    ]);
-?>            
-        <div class="invalid-feedback"></div>
+<?php
+    if(get_user_role(session()) == 1)
+    {
+        echo view('templates/activation_select', [
+            'id' => 'page-is-active',
+            'select_options' => [
+                1 => 'Active',
+                0 => 'Deactivate'
+            ],
+            'active' => (isset($post) ? $post['is_active'] : 0),
+            'required' => true,
+            'comment' => '<!-- Page Is Active -->'
+        ]);
+    }
+?>
         </div>
         <!-- Page cover page pictures -->
         <div class="mb-3">

@@ -42,6 +42,14 @@ const grid = new gridjs.Grid({
             name: "Published Time"
         },
         {
+            id: 'page-created-by',
+            name: "Created By"
+        },
+        {
+            id: 'page-created-at',
+            name: "Created At"
+        },
+        {
             id: 'page-is-active',
             name: "Is Active",
             formatter: (cell, row) => {
@@ -69,9 +77,9 @@ const grid = new gridjs.Grid({
                 })), gridjs.h('span', {
                     className: 'col-1'
                 }, gridjs.h('i', {
-                    className: 'fa-sharp fa-solid fa-' + (row.cells[4].data == '1' ?
+                    className: 'fa-sharp fa-solid fa-' + (row.cells[6].data == '1' ?
                         'ban' : 'check'),
-                    onClick: () => setContentStatus(row.cells[1].data, row.cells[4]
+                    onClick: () => setContentStatus(row.cells[1].data, row.cells[6]
                         .data)
                 })));
             }
@@ -115,7 +123,7 @@ function createDataReqObj() {
         then: r => {
             if(r.error) throw new Error("An error happened while fetching the data");
             else {
-                return r.data.map(c => [c.id, c.title, c.published_time, c.is_active, null])
+                return r.data.map(c => [c.id, c.title, c.published_time, c.created_by, c.created_at, c.is_active, null])
             }
         },
         handle: (r) => {

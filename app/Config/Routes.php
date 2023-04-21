@@ -38,10 +38,7 @@ $routes->group('/', function($routes) {
     // Directly return the desired page to the browser [Treated as GET]
     $routes->get('login', 'Pages\PageController::login');
     $routes->get('menu', 'Pages\PageController::menu');
-    $routes->group('f', function($routes){
-        $routes->get('content/list/(:num)', 'Pages\FrontendPageController::list/$1');
-        // $routes->view('content/list', 'pages/frontend/content_list');
-    });
+    $routes->get('register', 'Pages\PageController::register');
     // Content
     $routes->group('content', function($routes){
         $routes->get('', 'Pages\PostController::list');
@@ -133,7 +130,7 @@ $routes->group('api', function($routes) {
     $routes->get('staff/(:num)', 'API\StaffAPIController::get/$1');
     $routes->group('staff', ['filter' => 'authFilter'], function($routes){
         $routes->post('add', 'API\StaffAPIController::update/-1');
-        $routes->put('edit/(:num)', 'API\StaffAPIController::update/$1');
+        $routes->post('edit/(:num)', 'API\StaffAPIController::update/$1');
         $routes->delete('delete/(:num)', 'API\StaffAPIController::delete/$1');
     });
 

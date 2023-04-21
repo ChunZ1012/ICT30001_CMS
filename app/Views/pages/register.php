@@ -3,11 +3,11 @@
 
     $num_of_users = $user->selectCount('id')->first()['id'];
 
-    if($num_of_users <= 0)
+    if($num_of_users > 0)
     {
 ?>
     <script type="text/javascript">
-        window.location.href = '<?= base_url('register');?>';
+        window.location.href = '<?= base_url('login');?>';
     </script>
 <?php 
     } 
@@ -16,7 +16,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Login</title>
+    <title>Register</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -35,11 +35,12 @@
 
 <body class="container-fluid">
     <main class="d-flex flex-column align-items-center h-100 p-4">
-        <h1 class="fw-bold">Login</h1>
-        <form id="loginForm" method="POST" accept="utf-8" class="col-lg-8 col-10">
+        <h1 class="fw-bold">Register</h1>
+        <form id="register-form" method="POST" accept="utf-8" class="col-lg-8 col-10">
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" placeholder="Your Email" required/>
+                <div class="invalid-feedback">123</div>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
@@ -48,9 +49,25 @@
                     <span type="button" class="input-group-text" id="toggle-password-visibility">
                         <i class="fa-regular fa-eye" id="password-icon"></i>
                     </span>
+                    <div class="invalid-feedback"></div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary float-end">Login</button>
+            <div class="mb-3">
+                <label for="confirm-password" class="form-label">Confirm Password</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="confirm-password" name="confirm-password" placeholder="Confirm Password" spellcheck="false" autocorrect="false" autocapitalize="false" autocomplete="password" required/>
+                    <span type="button" class="input-group-text" id="toggle-password-visibility">
+                        <i class="fa-regular fa-eye" id="password-icon"></i>
+                    </span>    
+                    <div class="invalid-feedback"></div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="display-name" class="form-label">Display Name</label>
+                <input type="text" class="form-control" id="display-name" name="display-name" placeholder="Your Display Name" required/>
+                <div class="invalid-feedback"></div>
+            </div>
+            <button type="submit" class="btn btn-primary float-end">Register</button>
         </form>
     </main>
     <!-- Bootstrap JavaScript Libraries -->
@@ -91,30 +108,55 @@
                 }
             });
 
-            $("#loginForm").validate({
-            submitHandler: function(f){
-                var data = {
-                    "email" : $("#email").val(),
-                    "password" : $("#password").val()
-                };
-                $.post({
-                    url: '<?php echo base_url('api/auth/login'); ?>',
-                    contentType:'application/json',
-                    data: JSON.stringify(data),
-                    dataType:'json',
-                    success:function(r){
-                        toastSuccess('Logging in');
-                        $.cookie('<?= $key; ?>', r.msg);
-                        setTimeout(() => {
-                            window.location.href = '<?php echo base_url(); ?>'
-                        }, 1000);
+            $("#register-form").validate({
+                rules: {
+                    email: {
+                        required: true,
+                        email: true
                     },
-                    error:function(r){
-                        $r = $.parseJSON(r.responseText);
-                        toastError($r.msg);
+                    password: {
+                        required: true
+                    },
+                    'confirm-password': {
+                        required: true,
+                        equalTo:"#password"
                     }
-                })
-            }
+                },
+                submitHandler: function(f){
+                    $(this).removeClass('was-validated');
+                    var data = {
+                        "email" : $("#email").val(),
+                        "password" : $("#password").val(),
+                        "confirm-password": $("#confirm-password").val(),
+                        "display-name" : $("#display-name").val(),
+                    };
+                    $.post({
+                        url: '<?= base_url('api/auth/register'); ?>',
+                        contentType:'application/json',
+                        data: JSON.stringify(data),
+                        dataType:'json',
+                        success:function(r){
+                            toastSuccess('Successfully Registered!');
+                            setTimeout(() => {
+                                window.location.href = '<?= base_url('login'); ?>'
+                            }, 1000);
+                        },
+                        error:function(r){
+                            $r = $.parseJSON(r.responseText);
+                            if($r.validate_error) {
+                                $m = $.parseJSON($r.msg);
+                                $.each($m, function(k, v){
+                                    toastError(v);
+                                    
+                                    $t = $("#"+k+" ~ div.invalid-feedback");
+                                    $t.html(v);
+                                    $t.addClass("d-block");
+                                });
+                            }
+                            else toastError($r.msg);
+                        }
+                    })
+                }
             });
         });
     </script>

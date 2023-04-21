@@ -3,7 +3,6 @@
 namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
-use CodeIgniter\Database\RawSql;
 
 class AddUsers extends Migration
 {
@@ -44,7 +43,7 @@ class AddUsers extends Migration
             ],
             'deleted_at' => [
                 'type' => 'timestamp',
-                'default' => new RawSql("CURRENT_TIMESTAMP")
+                'null' => true
             ]
         ]);
 

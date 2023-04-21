@@ -66,15 +66,17 @@
 
     if(!function_exists('write_file_to_public'))
     {
-        function write_file_to_public(UploadedFile $file)
+        function write_file_to_public(UploadedFile $file, string $folderName)
         {
-            $public_uploads_path = getenv('PUBLIC_UPLOAD_PATH');
+            $public_uploads_path = getenv('PUBLIC_UPLOAD_PATH').$folderName;
             try
             {
                 // Create file object
                 $fileObj = new File(WRITEPATH.'uploads/'.$file->store());
                 // Get random name of file
                 $fileRndName = $fileObj->getRandomName();
+                // Create the public assets folder if not exist
+                if(!file_exists($public_uploads_path)) mkdir($public_uploads_path, 0777, false);
                 // Move file to public folder
                 $fileObj->move($public_uploads_path, $fileRndName, true);
                 // Delete temporary file
@@ -96,10 +98,10 @@
     
     if(!function_exists('delete_uploaded_file'))
     {
-        function delete_uploaded_file($filePath)
+        function delete_uploaded_file($filePath, string $folderName)
         {
             $baseDir = getcwd().'\\'.getenv("PUBLIC_UPLOAD_PATH");
-            $fileRealPath = $baseDir.'\\'.$filePath;
+            $fileRealPath = $baseDir.'\\'.$folderName.'\\'.$filePath;
             if(file_exists($fileRealPath) && is_file($fileRealPath)) 
             {
                 unlink($fileRealPath);

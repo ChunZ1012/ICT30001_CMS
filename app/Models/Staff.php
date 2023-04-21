@@ -19,6 +19,7 @@ class Staff extends Model
         'age',
         'gender',
         'contact',
+        'avatar',
         'email',
         'office_contact',
         'office_fax',
