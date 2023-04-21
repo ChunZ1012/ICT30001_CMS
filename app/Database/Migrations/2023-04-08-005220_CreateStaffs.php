@@ -14,7 +14,12 @@ class CreateStaffs extends Migration
                 'type' => 'BIGINT',
                 'constraint' => 255,
                 'unsigned' => true,
-                'auto_increment' => true
+                'auto_increment' => true            
+            ],
+            'image' => [
+                'type' => 'varchar',
+                'constraint' => 160,
+                'null' => false
             ],
             'name' => [
                 'type' => 'nvarchar',
@@ -45,16 +50,16 @@ class CreateStaffs extends Migration
             'email' => [
                 'type' => 'varchar',
                 'constraint' => 60,
-                'null' => true
+                'unique' => true
             ],
-            'office_contact' => [
+            'position' => [
                 'type' => 'varchar',
-                'constraint' => 10,
-                'null' => true
+                'constraint' => 160,
+                'null' => false
             ],
-            'office_fax' => [
+            'location' => [
                 'type' => 'varchar',
-                'constraint' => 10,
+                'constraint' => 255,
                 'null' => true
             ],
             'created_at' => [
