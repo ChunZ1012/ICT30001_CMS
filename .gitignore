@@ -26,3 +26,5 @@ writable/session/*
 writable/uploads/*
 
 public/assets/uploads/*
+
+.vs/*

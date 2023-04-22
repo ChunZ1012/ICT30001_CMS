@@ -40,7 +40,7 @@
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" placeholder="Your Email" required/>
-                <div class="invalid-feedback">123</div>
+                <label class="invalid-feedback error" for="email" generated="true"></label>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
@@ -49,23 +49,24 @@
                     <span type="button" class="input-group-text" id="toggle-password-visibility">
                         <i class="fa-regular fa-eye" id="password-icon"></i>
                     </span>
-                    <div class="invalid-feedback"></div>
+                    <label class="invalid-feedback error" for="password" generated="true"></label>
                 </div>
             </div>
             <div class="mb-3">
                 <label for="confirm-password" class="form-label">Confirm Password</label>
                 <div class="input-group">
                     <input type="password" class="form-control" id="confirm-password" name="confirm-password" placeholder="Confirm Password" spellcheck="false" autocorrect="false" autocapitalize="false" autocomplete="password" required/>
-                    <span type="button" class="input-group-text" id="toggle-password-visibility">
+                    <span type="button" class="input-group-text" id="toggle-confirm-password-visibility">
                         <i class="fa-regular fa-eye" id="password-icon"></i>
                     </span>    
-                    <div class="invalid-feedback"></div>
+                    <label class="invalid-feedback error" for="confirm-password" generated="true"></label>
                 </div>
             </div>
             <div class="mb-3">
                 <label for="display-name" class="form-label">Display Name</label>
                 <input type="text" class="form-control" id="display-name" name="display-name" placeholder="Your Display Name" required/>
                 <div class="invalid-feedback"></div>
+                <label class="invalid-feedback error" for="display-name" generated="true"></label>
             </div>
             <button type="submit" class="btn btn-primary float-end">Register</button>
         </form>
@@ -89,24 +90,8 @@
 
     <script type="text/javascript">
         $(function(){
-            $("#toggle-password-visibility").click(function(e){
-                e.preventDefault();
-                
-                $pass = $("#password");
-                $passIcon = $("#password-icon");
-                $type = $pass.attr("type");
-
-                if($type == "password"){
-                    $pass.attr("type", "text");
-                    $passIcon.removeClass('fa-eye');
-                    $passIcon.addClass('fa-eye-slash');
-                }
-                else {
-                    $pass.attr("type", "password");
-                    $passIcon.removeClass('fa-eye-slash');
-                    $passIcon.addClass('fa-eye');
-                }
-            });
+            setPasswordToggler("toggle-password-visibility");
+            setPasswordToggler("toggle-confirm-password-visibility");
 
             $("#register-form").validate({
                 rules: {
@@ -123,7 +108,6 @@
                     }
                 },
                 submitHandler: function(f){
-                    $(this).removeClass('was-validated');
                     var data = {
                         "email" : $("#email").val(),
                         "password" : $("#password").val(),
@@ -148,7 +132,7 @@
                                 $.each($m, function(k, v){
                                     toastError(v);
                                     
-                                    $t = $("#"+k+" ~ div.invalid-feedback");
+                                    $t = $("#"+k+" ~ label.invalid-feedback");
                                     $t.html(v);
                                     $t.addClass("d-block");
                                 });

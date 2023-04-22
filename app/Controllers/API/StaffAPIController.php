@@ -93,6 +93,7 @@ class StaffAPIController extends BaseController
             // User requests to add staff information
             if($id < 0)
             {
+                $rndName = '';
                 // Validate input, and throw ValidationError if
                 // one of rule is not obeyed
                 if(!$this->validate('staff_add')) throw new ValidationException();
@@ -107,16 +108,21 @@ class StaffAPIController extends BaseController
                     'created_by' => get_user_id(session())
                 ];
                 // Try to save the image/ avatar to public assets folder
-                if(!is_null($avatar) && !$avatar->hasMoved() && $avatar->isValid()) 
+                if(is_uploaded_file_valid($avatar)) 
                 {
                     $rndName = write_file_to_public($avatar, 'avatars');
                     $d['avatar'] = $rndName;
                 }
-
+                else throw new InvalidArgumentException("The avatar uploaded is not valid!");
                 // Insert data into db
                 $r = $this->staffModel->insert($d);
                 // Throw exception if the data are not inserted into db                
-                if(!$r) throw new Exception('Error when adding the staff information!');                
+                if(!$r) 
+                {
+                    // Delete uploaded file if insertion is failed
+                    delete_uploaded_file($rndName, 'avatars');
+                    throw new Exception('Error when adding the staff information!');
+                }          
                 // Set success response message
                 $respData['msg'] = 'Successfully added!';
             }
@@ -128,6 +134,9 @@ class StaffAPIController extends BaseController
                 if(is_null($staff)) throw new InvalidArgumentException('The selected staff is no longer exist!');
                 // Always ignore the email validation during editing
                 $rules_ignore = ['staff-email'];
+                // Ignore the staff avatar if the user did not upload it
+                if(!is_uploaded_file_valid($avatar)) array_push($rules_ignore, 'staff-avatar');
+                log_message('debug', $avatar->getMimeType());
                 // Validate input, and throw ValidationError if one of rule is not obeyed
                 if(!$this->validateRequest($input, 'staff_add', $rules_ignore)) throw new ValidationException();
 
@@ -141,7 +150,7 @@ class StaffAPIController extends BaseController
                     'modified_by' => get_user_id(session())
                 ];
 
-                if(!is_null($avatar) && !$avatar->hasMoved() && $avatar->isValid()) 
+                if(is_uploaded_file_valid($avatar)) 
                 {
                     $rndName = write_file_to_public($avatar, 'avatars');
                     // Remove uploaded avatar

@@ -9,7 +9,7 @@
 ?>
 <?=
     form_dropdown(
-        "page-is-active",
+        $id,
         $select_options,
         $active,
         [
@@ -18,5 +18,5 @@
             'required' => $required,
     ]);
 ?>
-<?= '<div class="invalid-feedback"></div>'; ?>
+<?= '<label class="invalid-feedback error" for="'.$id.'" generated="true"></label>'; ?>
 <?= '</div>'; ?>

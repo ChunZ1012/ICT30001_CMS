@@ -95,7 +95,7 @@ class PostAPIController extends BaseController
                     {
                         $image = $c['page-image'];
                         // Save covers to public folder
-                        if(!is_null($image) && !$image->hasMoved() && $image->isValid()) 
+                        if(is_uploaded_file_valid($image)) 
                         {
                             $imgRndName = write_file_to_public($image, 'posts');
                             $postImageData = [
@@ -159,7 +159,7 @@ class PostAPIController extends BaseController
                     // If the cover uploaded is not inside the db, then store it
                     else 
                     {
-                        if(!is_null($img) && !$img->hasMoved() && $img->isValid()) 
+                        if(is_uploaded_file_valid($img)) 
                         {
                            $imgRndName = write_file_to_public($img, 'posts');
                            $postImageData['post_id'] = $post['id'];
@@ -168,6 +168,7 @@ class PostAPIController extends BaseController
                         }
                     }
                     $postImageData['description'] = $coverMeta['page-image-alt-text'];
+                    // append and prepend content with div tag, used by the front end parser
                     $postImageData['content'] = '<div>'.$coverMeta['page-image-content'].'</div>';
                     
                     // Get the image content id

@@ -44,3 +44,26 @@ function toastLoading(title = '', desc = '') {
         }
     });
 }
+
+function setPasswordToggler(input) {
+    $(function(){
+        $("#" + input).click(function(e){
+            e.preventDefault();
+
+            $passInput = $(this).prev();
+            $passIcon = $("#" + input + " > i:first-child");
+            $passType = $passInput.attr("type");
+
+            if($passType == "password") {
+                $passInput.attr("type", "text");
+                $passIcon.addClass("fa-eye-slash");
+                $passIcon.removeClass("fa-eye");
+            }
+            else {
+                $passInput.attr("type", "password");
+                $passIcon.addClass("fa-eye");
+                $passIcon.removeClass("fa-eye-slash");
+            }
+        });
+    });
+}

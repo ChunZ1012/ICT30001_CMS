@@ -112,13 +112,16 @@ class PublicationAPIController extends BaseController
                 $pub = $this->pubModel->find($id);
                 // Throw exception if the id is not in the system
                 if(is_null($pub)) throw new Exception('The selected publication is no longer exist!');
-
-                // Use different set of validation rule,
-                // as the user might only made change to
-                // other inputs, rather than cover and pdf
-                if(!$this->validate('publish_edit')) throw new ValidationException();
+                // Define the rules to be ignored by the validator
+                $rules_ignore = [];
+                // If the user did not upload any publication cover, then we will tell the validator to skip validate it
+                if(!is_uploaded_file_valid($img)) array_push($rules_ignore, 'pub-cover');
+                // If the user did not upload any publication file, then we will tell the validator to skip validate it
+                if(!is_uploaded_file_valid($file)) array_push($rules_ignore, 'pub-file');
+                // Throw error if the validation failed
+                if(!$this->validateRequest($postData, 'publish_add', $rules_ignore)) throw new ValidationException();
                 // Write cover file to public folder
-                if(!is_null($img) && !$img->hasMoved() && $img->isValid()) 
+                if(is_uploaded_file($img)) 
                 {
                     $imgRndName = write_file_to_public($img, 'pubs');
                     // Remove uploaded cover
@@ -129,7 +132,7 @@ class PublicationAPIController extends BaseController
                 // Get pdf file from form data
                 $file = $this->request->getFile('pub-file');
                 // Write cover file to public folder
-                if(!is_null($file) && !$file->hasMoved() && $file->isValid()) 
+                if(is_uploaded_file($file)) 
                 {
                     $fileRndName = write_file_to_public($file, 'pubs');
                     // Remove uploaded pdf file
@@ -142,6 +145,7 @@ class PublicationAPIController extends BaseController
                 $pub['published_time'] = $postData['pub-publish-time'];
                 // Only admin has the role to set the active status
                 $pub['is_active'] = get_user_role(session()) == '1' ? $postData['pub-is-active'] : 0;
+                $pub['modified_by'] = get_user_id(session());
                 // Update the data into db
                 $r = $this->pubModel->update($id, $pub);
                 // TODO: Category the insertion error to different exception class
@@ -156,20 +160,19 @@ class PublicationAPIController extends BaseController
             {
                 // Validate input, and throw ValidationError if
                 // one of rule is not obeyed
-                if(!$this->validate('publish_add')) throw new ValidationException();
+                if(!$this->validateRequest($postData, 'publish_add')) throw new ValidationException();
                 // Cover file name
                 $imgFileName = '';
                 // Get pdf file name
                 $fileFileName = '';
                 // Write cover file to public folder
-                if(!is_null($img) && !$img->hasMoved() && $img->isValid()) $imgFileName = write_file_to_public($img, 'pubs');
+                if(is_uploaded_file_valid($img)) $imgFileName = write_file_to_public($img, 'pubs');
                 // Write file to public folder
-                if(!is_null($file) && !$file->hasMoved() && $file->isValid()) $fileFileName = write_file_to_public($file, 'pubs');
+                if(is_uploaded_file_valid($file)) $fileFileName = write_file_to_public($file, 'pubs');
                 $d = [
                     'title' => $postData['pub-title'],
                     // TODO: Get category from form data
                     // 'category' => $data['pub-category'],
-                    'category' => 'SC',
                     'published_time' => $postData['pub-publish-time'],
                     'is_active' => (get_user_role(session()) == '1' ? $postData['pub-is-active'] : 0),
                     'cover' => ($imgFileName),

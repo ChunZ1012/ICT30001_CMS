@@ -40,6 +40,7 @@
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" placeholder="Your Email" required/>
+                <label class="invalid-feedback error" for="email" generated="true"></label>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
@@ -48,6 +49,7 @@
                     <span type="button" class="input-group-text" id="toggle-password-visibility">
                         <i class="fa-regular fa-eye" id="password-icon"></i>
                     </span>
+                    <label class="invalid-feedback error" for="password" generated="true"></label>
                 </div>
             </div>
             <button type="submit" class="btn btn-primary float-end">Login</button>
@@ -72,49 +74,41 @@
 
     <script type="text/javascript">
         $(function(){
-            $("#toggle-password-visibility").click(function(e){
-                e.preventDefault();
-                
-                $pass = $("#password");
-                $passIcon = $("#password-icon");
-                $type = $pass.attr("type");
-
-                if($type == "password"){
-                    $pass.attr("type", "text");
-                    $passIcon.removeClass('fa-eye');
-                    $passIcon.addClass('fa-eye-slash');
-                }
-                else {
-                    $pass.attr("type", "password");
-                    $passIcon.removeClass('fa-eye-slash');
-                    $passIcon.addClass('fa-eye');
-                }
-            });
+            setPasswordToggler("toggle-password-visibility");
 
             $("#loginForm").validate({
-            submitHandler: function(f){
-                var data = {
-                    "email" : $("#email").val(),
-                    "password" : $("#password").val()
-                };
-                $.post({
-                    url: '<?php echo base_url('api/auth/login'); ?>',
-                    contentType:'application/json',
-                    data: JSON.stringify(data),
-                    dataType:'json',
-                    success:function(r){
-                        toastSuccess('Logging in');
-                        $.cookie('<?= $key; ?>', r.msg);
-                        setTimeout(() => {
-                            window.location.href = '<?php echo base_url(); ?>'
-                        }, 1000);
+                rules: {
+                    "email" : {
+                        required: true,
+                        email: true
                     },
-                    error:function(r){
-                        $r = $.parseJSON(r.responseText);
-                        toastError($r.msg);
+                    "password": {
+                        required: true
                     }
-                })
-            }
+                },
+                submitHandler: function(f){
+                    var data = {
+                        "email" : $("#email").val(),
+                        "password" : $("#password").val()
+                    };
+                    $.post({
+                        url: '<?php echo base_url('api/auth/login'); ?>',
+                        contentType:'application/json',
+                        data: JSON.stringify(data),
+                        dataType:'json',
+                        success:function(r){
+                            toastSuccess('Logging in');
+                            $.cookie('<?= $key; ?>', r.msg);
+                            setTimeout(() => {
+                                window.location.href = '<?php echo base_url(); ?>'
+                            }, 1000);
+                        },
+                        error:function(r){
+                            $r = $.parseJSON(r.responseText);
+                            toastError($r.msg);
+                        }
+                    })
+                }
             });
         });
     </script>

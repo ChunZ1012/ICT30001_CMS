@@ -46,6 +46,14 @@
         }
     }
 
+    if(!function_exists('is_uploaded_file_valid'))
+    {
+        function is_uploaded_file_valid($file)
+        {
+            return !is_null($file) && !$file->hasMoved() && $file->isValid();
+        }
+    }
+
     if(!function_exists('get_user_id'))
     {
         function get_user_id($session)

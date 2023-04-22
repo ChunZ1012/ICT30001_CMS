@@ -6,7 +6,7 @@ use CodeIgniter\Database\Migration;
 
 class PostImageContent extends Migration
 {
-    private $table_name = 'post_image_content';
+    private $table_name = 'post_images';
     public function up()
     {
         $this->forge->addField([

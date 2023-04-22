@@ -114,31 +114,6 @@ class Validation extends BaseConfig
             ]
         ],
     ];
-    public array $publish_edit = [
-        'pub-title' => [
-            'label' => 'Publication Title',
-            'rules' => [
-                'required',
-                'string'
-            ]
-        ],
-        'pub-publish-time' => [
-            'label' => 'Publication Publish Time',
-            'rules' => [
-                'required',
-                'valid_date'
-            ]
-        ],
-        'pub-is-active' => [
-            'label' => 'Is Active',
-            'rules' => [
-                'required'
-            ]
-        ]
-        // Not necessary need to validate the cover and pdf,
-        // since sometimes the user only made change to
-        // other inputs
-    ];
     public array $publish_add = [
         'pub-title' => [
             'label' => 'Publication Title',
@@ -162,14 +137,25 @@ class Validation extends BaseConfig
         'pub-cover' => [
             'label' => 'Publication Cover',
             'rules' => [
+                'is_image[pub-cover]',
+                'mime_in[pub-cover,image/png,image/jpeg,image/jpg,image/gif]',
+                'ext_in[pub-cover,.png,.jpeg,.jpg,.gif]',
                 'max_size[pub-cover,5120]',
-                'is_image[pub-cover]'
+            ],
+            'errors' => [
+                'max_size' => 'The maximum size allowed is less than 5 MB!',
+                'is_image' => 'The file uploaded is not an image!',
+                'mime_in' => 'The file uploaded is not an image!',
+                'ext_in' => 'The file extension is not matched with its MIME!'
             ]
         ],
         'pub-file' => [
             'label' => 'Publication File',
             'rules' => [
-                'mime_in[pub-file,application/pdf]'
+                'mime_in[pub-file,application/pdf]',
+            ],
+            'errors' => [
+                'mime_in'=> 'The file uploaded is not a pdf!',
             ]
         ]
     ];
@@ -229,6 +215,21 @@ class Validation extends BaseConfig
             ],
             'errors' => [
                 'in_list' => 'The value {value} for {field} is not valid!'
+            ]
+        ],
+        'staff-avatar' => [
+            'label' => 'staff avatar',
+            'rules' => [
+                'uploaded[staff-avatar]',
+                'is_image[staff-avatar]',
+                'mime_in[staff-avatar,image/png,image/jpeg,image/jpg,image/gif]',
+                'ext_in[staff-avatar,.png,.jpeg,.jpg,.gif]'
+            ],
+            'errors' => [
+                'uploaded' => 'Failed to upload the file!',
+                'is_image' => 'The file uploaded is not an image!',
+                'mime_in' => 'The file uploaded is not an image!',
+                'ext_in' => 'The file extension is not matched with its MIME!'
             ]
         ],
         'staff-contact' => [

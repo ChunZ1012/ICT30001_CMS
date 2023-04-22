@@ -20,7 +20,7 @@ window.location.href = '<?=base_url('staff/list');?>';
 ?>
 
 <div class="row">
-    <form class="d-flex flex-column" id="staff-form" method="post" novalidate>
+    <form class="d-flex flex-column" id="staff-form" name="staff-form" method="post" enctype="multipart/form-data" novalidate>
         <!-- Action buttons -->
         <div class="d-flex flex-row mb-1 ms-auto">
             <a href="<?=base_url('staff/list');?>" type="submit" class="btn btn-danger ms-2">Cancel</a>
@@ -38,7 +38,7 @@ window.location.href = '<?=base_url('staff/list');?>';
                 'name' => 'staff-name',
                 'required' => '',
             ], 'text');?>
-            <div class="invalid-feedback"></div>
+            <label class="invalid-feedback"></label>
         </div>
         <!-- Staff Age -->
         <div class="mb-3">
@@ -53,7 +53,7 @@ window.location.href = '<?=base_url('staff/list');?>';
                 'pattern' => '[0-9]{2,3}',
                 'required' => '',
             ], 'number');?>
-            <div class="invalid-feedback"></div>
+            <label class="invalid-feedback"></label>
         </div>
         <!-- Staff Gender -->
         <div class="mb-3">
@@ -69,18 +69,19 @@ window.location.href = '<?=base_url('staff/list');?>';
                 'id' => 'staff-gender',
                 'required' => '',
             ]); ?>
-            <div class="invalid-feedback"></div>
+            <label class="invalid-feedback"></label>
         </div>
-        <!-- Publication Cover -->
+        <!-- Staff Avatar -->
         <div class="mb-3">
             <label for="staff-avatar" class="form-label">Choose Image</label>
-            <div class="d-flex flex-row">
+            <div class="input-group">
                 <input type="file" class="form-control" id="staff-avatar" name="staff-avatar" accept="image/*"
                     aria-describedby="staff-avatar-help-text" <?= isset($pub) ? '' : 'required' ?>>
-                <?= isset($post) && $is_edit ? view('templates/preview_btn', ['link' => $filePrefix.$post['avatar']]) : ''; ?>
+                    <?= isset($post) && $is_edit ? view('templates/preview_btn', ['link' => $filePrefix.$post['avatar']]) : ''; ?>
+                </input>
+                <label class="invalid-feedback"></label>
             </div>
             <div id="staff-avatar-help-text" class="form-text">Use this to upload the image of staff</div>
-            <div class="invalid-feedback"></div>
         </div>
         <!-- Staff Contact -->
         <div class="mb-3">
@@ -94,7 +95,7 @@ window.location.href = '<?=base_url('staff/list');?>';
                 'pattern' => '[0-9]{3}-[0-9]{7,8}',
                 'required' => '',
             ], 'text');?>
-            <div class="invalid-feedback"></div>
+            <label class="invalid-feedback"></label>
         </div>
         <!-- Staff Email -->
         <div class="mb-3">
@@ -107,7 +108,7 @@ window.location.href = '<?=base_url('staff/list');?>';
                 'id' => 'staff-email',
                 'required' => '',
             ], 'email');?>
-            <div class="invalid-feedback"></div>
+            <label class="invalid-feedback"></label>
         </div>
         <!-- Staff Office Contact -->
         <div class="mb-3">
@@ -122,7 +123,7 @@ window.location.href = '<?=base_url('staff/list');?>';
                 'max-length' => 10,
                 'required' => ''
             ], 'text');?>
-            <div class="invalid-feedback"></div>
+            <label class="invalid-feedback"></label>
         </div>
         <!-- Staff Fax -->
         <div class="mb-3">
@@ -137,7 +138,7 @@ window.location.href = '<?=base_url('staff/list');?>';
                 'max-length' => 10,
                 'required' => ''
             ], 'text');?>
-            <div class="invalid-feedback"></div>
+            <label class="invalid-feedback"></label>
         </div>
     </form>
 </div>
@@ -186,7 +187,8 @@ $(function() {
                         $m = $.parseJSON($r.msg);
                         $.each($m, function(k, v) {
                             toastError(v);
-                            $("#" + k + " ~ div.invalid-feedback").html(v);
+                            $("#" + k + " ~ label.invalid-feedback").html(v);
+                            $("#" + k).parent().siblings(".invalid-feedback").html(v);
                         });
                         $("form#staff-form")[0].checkValidity();
                         $("form#staff-form").addClass('was-validated');

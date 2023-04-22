@@ -77,9 +77,9 @@ const grid = new gridjs.Grid({
                 })), gridjs.h('span', {
                     className: 'col-1'
                 }, gridjs.h('i', {
-                    className: 'fa-sharp fa-solid fa-' + (row.cells[4].data == '1' ?
+                    className: 'fa-sharp fa-solid fa-' + (row.cells[6].data == '1' ?
                         'ban' : 'check'),
-                    onClick: () => setPublicationStatus(row.cells[1].data, row.cells[4]
+                    onClick: () => setPublicationStatus(row.cells[1].data, row.cells[6]
                         .data)
                 })));
             }

@@ -75,7 +75,7 @@
             'id' => 'pub-title',
             'required' => ''
         ]); ?>
-        <div class="invalid-feedback"></div>
+        <label class="invalid-feedback"></label>
     </div>
     <!-- Publication publish time -->
     <div class="mb-3">
@@ -88,7 +88,7 @@
             'id' => 'pub-publish-time',
             'required' => ''
         ], "date"); ?>
-        <div class="invalid-feedback"></div>
+        <label class="invalid-feedback"></label>
     </div>
 <?php
     if(get_user_role(session()) == 1)
@@ -108,22 +108,22 @@
     <!-- Publication Cover -->
     <div class="mb-3">
         <label for="pub-cover" class="form-label">Choose Cover</label>
-        <div class="d-flex flex-row">
-            <input type="file" class="form-control" id="pub-cover" name="pub-cover" accept="image/*" aria-describedby="pub-cover-help-text" <?= isset($pub) ? '' : 'required' ?>>
+        <div class="input-group">
+            <input type="file" class="form-control" id="pub-cover" name="pub-cover" accept="image/*" aria-describedby="pub-cover-help-text" <?= isset($pub) ? '' : 'required' ?>/>
             <?= isset($pub) ? view('templates/preview_btn', ['link' => $filePrefix.$pub['cover']]) : ''; ?>
+            <label class="invalid-feedback"></label>
         </div>
         <div id="pub-cover-help-text" class="form-text">Use this to upload the cover of publication</div>
-        <div class="invalid-feedback"></div>
     </div>
     <!-- Publication Content -->
     <div class="mb-3">
         <label for="pub-file" class="form-label">Choose file</label>
-        <div class="d-flex flex-row">
+        <div class="input-group">
             <input type="file" class="form-control" id="pub-file" name="pub-file" accept="application/pdf" aria-describedby="pub-file-help-text" <?= isset($pub) ? '' : 'required' ?>>
             <?= isset($pub) ? view('templates/preview_btn', ['link' => $filePrefix.$pub['pdf']]) : ''; ?>
+            <label class="invalid-feedback"></label>
         </div>
         <div id="pub-file-help-text" class="form-text">Use this to upload the pdf of the publication</div>
-        <div class="invalid-feedback"></div>
     </div>
 </form>
 
@@ -133,9 +133,7 @@
             e.preventDefault();
             $(this).removeClass('was-validated');
 
-            $form = $(this)[0];
-            $fd = new FormData($form);
-
+            $fd = new FormData($(this)[0]);
             toastLoading();
 
             $.post({
@@ -148,7 +146,6 @@
                 processData:false,
                 contentType:false,
                 success: (r) => {
-                    Swal.close()
                     if(!r.error) {
                         toastSuccess('Successfully added!');
                     }
@@ -166,7 +163,7 @@
                             $m = $.parseJSON($r.msg);
                             $.each($m, function(k, v){
                                 toastError(v);
-                                $("#"+k+" ~ div.invalid-feedback").html(v);
+                                $("#"+k+" ~ label.invalid-feedback").html(v);
                             });
                             $("form#pub-form")[0].checkValidity();
                             $("form#pub-form").addClass('was-validated');

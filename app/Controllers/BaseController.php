@@ -99,8 +99,6 @@ abstract class BaseController extends Controller
                     }
                 }
             }
-
-            log_message('debug', json_encode($rules));
         }
         return $this->validator->setRules($rules, $messages)->run($input);
     } 
