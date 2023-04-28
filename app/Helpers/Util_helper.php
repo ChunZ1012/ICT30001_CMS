@@ -76,7 +76,7 @@
     {
         function write_file_to_public(UploadedFile $file, string $folderName)
         {
-            $public_uploads_path = getenv('PUBLIC_UPLOAD_PATH').$folderName;
+            $public_uploads_path = PUBLICPATH.''.getenv('PUBLIC_UPLOAD_PATH').$folderName;
             try
             {
                 // Create file object
@@ -84,7 +84,7 @@
                 // Get random name of file
                 $fileRndName = $fileObj->getRandomName();
                 // Create the public assets folder if not exist
-                if(!file_exists($public_uploads_path)) mkdir($public_uploads_path, 0777, false);
+                if(!file_exists($public_uploads_path)) mkdir($public_uploads_path, 0777, true);
                 // Move file to public folder
                 $fileObj->move($public_uploads_path, $fileRndName, true);
                 // Delete temporary file
@@ -106,14 +106,14 @@
     
     if(!function_exists('delete_uploaded_file'))
     {
-        function delete_uploaded_file($filePath, string $folderName)
+        function delete_uploaded_file($fileName, string $folderName)
         {
-            $baseDir = getcwd().'\\'.getenv("PUBLIC_UPLOAD_PATH");
-            $fileRealPath = $baseDir.'\\'.$folderName.'\\'.$filePath;
+            $baseDir = PUBLICPATH.''.getenv('PUBLIC_UPLOAD_PATH');
+            $fileRealPath = $baseDir.'\\'.$folderName.'\\'.$fileName;
             if(file_exists($fileRealPath) && is_file($fileRealPath)) 
             {
                 unlink($fileRealPath);
-                log_message('info', $filePath.' has been removed');
+                log_message('info', $fileName.' has been removed');
             }
             else log_message('warning', 'The file path: '.$fileRealPath.' is not exist! Delete aborted');
         }
