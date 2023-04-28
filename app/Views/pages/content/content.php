@@ -39,8 +39,7 @@ if ($is_edit) {
         <!-- Action buttons -->
         <div class="d-flex flex-row mb-1 ms-auto">
             <a href="<?=base_url('content/list');?>" type="submit" class="btn btn-danger ms-2">Cancel</a>
-            <button type="submit" class="btn btn-success ms-2">Save</button>
-            <?=isset($post) ? view('templates/preview_btn', ['link' => base_url('content/view/' . $post['id'])]) : ''?>
+            <button type="submit" class="btn btn-success ms-2" id="submit-btn" onclick="javascript:void(0)" value="Save">Save</button>
         </div>
         <!-- Page title -->
         <div class="mb-3">
@@ -71,12 +70,13 @@ if ($is_edit) {
 <?php
     if(get_user_role(session()) == 1)
     {
-        echo view('templates/activation_select', [
+        echo view('templates/select_dropdown', [
             'id' => 'page-is-active',
             'select_options' => [
                 1 => 'Active',
                 0 => 'Deactivate'
             ],
+            'label' => 'Is Active',
             'active' => (isset($post) ? $post['is_active'] : 0),
             'required' => true,
             'comment' => '<!-- Page Is Active -->'
@@ -184,7 +184,10 @@ $(function() {
             contentType:false,
             processData:false,
             success:(r) => {
-                if(!r.error) toastSuccess('Successfully saved!', true);
+                if(!r.error) {
+                    $('#submit-btn').prop('disabled', true);
+                    toastSuccess('Successfully saved!', true);
+                }
                 else {
                     toastError('Error when saving the content!');
                     toastError(r.msg);

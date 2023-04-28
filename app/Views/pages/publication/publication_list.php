@@ -42,6 +42,10 @@ const grid = new gridjs.Grid({
             name: "Published Time"
         },
         {
+            id: 'pub-category',
+            name: "Published Category"
+        },
+        {
             id: 'pub-created-by',
             name: "Created By"
         },
@@ -77,9 +81,9 @@ const grid = new gridjs.Grid({
                 })), gridjs.h('span', {
                     className: 'col-1'
                 }, gridjs.h('i', {
-                    className: 'fa-sharp fa-solid fa-' + (row.cells[6].data == '1' ?
+                    className: 'fa-sharp fa-solid fa-' + (row.cells[7].data == '1' ?
                         'ban' : 'check'),
-                    onClick: () => setPublicationStatus(row.cells[1].data, row.cells[6]
+                    onClick: () => setPublicationStatus(row.cells[1].data, row.cells[7]
                         .data)
                 })));
             }
@@ -117,7 +121,7 @@ function createDataReqObj() {
     return {
         url: '<?= base_url('api/publish/list'); ?>',
         method: 'GET',
-        then: r => r.data.data.map(c => [c.id, c.title, c.published_time, c.created_by, c.created_at, c.is_active, null]),
+        then: r => r.data.data.map(c => [c.id, c.title, c.published_time, c.category, c.created_by, c.created_at, c.is_active, null]),
         handle: (r) => {
             if (r.status == 200) return r.json();
             else return {

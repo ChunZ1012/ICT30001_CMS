@@ -119,6 +119,21 @@
         }
     }
 
+    if(!function_exists('get_publication_public_path'))
+    {
+        function get_publication_public_path()
+        {
+            return base_url(getenv("PUBLIC_UPLOAD_PATH")).'pubs/';
+        }
+    }
+    if(!function_exists('get_post_public_path'))
+    {
+        function get_posts_public_path()
+        {
+            return base_url(getenv("PUBLIC_UPLOAD_PATH")).'posts/';
+        }
+    }
+
     if(!function_exists('get_random_string'))
     {
         function get_random_string($c)

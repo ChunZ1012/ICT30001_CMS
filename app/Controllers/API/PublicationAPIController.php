@@ -26,21 +26,27 @@ class PublicationAPIController extends BaseController
         {
             $fromUnity = filter_var($this->request->getHeaderLine('X-Unity-Req'), FILTER_VALIDATE_BOOL);
 
+            $unitySql = 'publications.id, title, category, CONCAT(\''.get_publication_public_path().'\', cover) as cover, CONCAT(\''.get_publication_public_path().'\', pdf) as pdf';
+
+            $webSql = 'publications.id, title, is_active, category, date_format(published_time, "%Y-%m-%d") as published_time, date_format(publications.created_at, "%Y-%m-%d") as created_at, display_name as created_by';
+
             $data = $this->pubModel->select(
-                'publications.id, title, is_active, date_format(published_time, "%Y-%m-%d") as published_time, date_format(publications.created_at, "%Y-%m-%d") as created_at, display_name as created_by'
+                ($fromUnity ? $unitySql : $webSql)
             )
             ->join('users', 'users.id = publications.created_by')
             // Only returning active publication if the request is from unity
             ->where($fromUnity ? 'is_active' : 'publications.id >=' , 1)
             ->findAll();
-
+            // If the request is not from unity
+            // Then add in the total available puublications count into the response
+            $d = [];
             if(!$fromUnity)
             {
-                $data['data'] = $data;
-                $data['total'] = $this->pubModel->selectCount('id')->first()['id'];
+                $d['data'] = $data;
+                $d['total'] = $this->pubModel->selectCount('id')->first()['id'];
             }
 
-            $respData['data'] = $fromUnity ? json_encode($data) : $data;
+            $respData['data'] = $fromUnity ? json_encode($data) : $d;
         }
         catch(Exception $e)
         {
@@ -62,14 +68,19 @@ class PublicationAPIController extends BaseController
         {
             $fromUnity = filter_var($this->request->getHeaderLine('X-Unity-Req'), FILTER_VALIDATE_BOOL);
 
+            $unitySql = 'publications.id, title, category, CONCAT(\''.base_url(getenv("PUBLIC_UPLOAD_PATH")).'pubs/\', cover) as cover, CONCAT(\''.base_url(getenv("PUBLIC_UPLOAD_PATH")).'pubs/\', pdf) as pdf';
+
+            $webSql = $unitySql. ', is_active, date_format(published_time, "%Y-%m-%d") as published_time, date_format(publications.created_at, "%Y-%m-%d") as created_at, display_name as created_by';
+
             $rSql = new RawSql(
-                'id, title, category, is_active, CONCAT(\''.base_url(getenv("PUBLIC_UPLOAD_PATH")).'\', cover) as cover, CONCAT(\''.base_url(getenv("PUBLIC_UPLOAD_PATH")).'\', pdf) as pdf,  published_time'
+                ($fromUnity ? $unitySql : $webSql)
             );
             $pub = $this->pubModel
                 ->select($rSql)
-                ->where('id', $id)
+                ->join('users', 'publications.created_by = users.id')
+                ->where('publications.id', $id)
                 // Only return the publication detail if the post is active and requested from unity
-                ->where($fromUnity ? 'is_active' : 'id >=', 1)
+                ->where($fromUnity ? 'publications.is_active' : 'publications.id >=', 1)
                 ->first();
             // Throw if the id is not exist in db
             if(is_null($pub)) throw new InvalidArgumentException("The selected publication is no longer exist!");
@@ -143,6 +154,7 @@ class PublicationAPIController extends BaseController
                 // Update object data
                 $pub['title'] = $postData['pub-title'];
                 $pub['published_time'] = $postData['pub-publish-time'];
+                $pub['category'] = $postData['pub-category'];
                 // Only admin has the role to set the active status
                 $pub['is_active'] = get_user_role(session()) == '1' ? $postData['pub-is-active'] : 0;
                 $pub['modified_by'] = get_user_id(session());
@@ -175,6 +187,7 @@ class PublicationAPIController extends BaseController
                     // 'category' => $data['pub-category'],
                     'published_time' => $postData['pub-publish-time'],
                     'is_active' => (get_user_role(session()) == '1' ? $postData['pub-is-active'] : 0),
+                    'category' => $postData['pub-category'],
                     'cover' => ($imgFileName),
                     'pdf' => ($fileFileName),
                     'created_by' => get_user_id(session())

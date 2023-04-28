@@ -5,7 +5,7 @@
     {
         $pubModel = new \App\Models\Publication();
         $pub = $pubModel->select(
-            'id, title, is_active, date_format(published_time, "%Y-%m-%d") as published_time, CONCAT(\''.getenv("PUBLIC_UPLOAD_PATH").'pubs/\', cover) as cover, CONCAT(\''.getenv("PUBLIC_UPLOAD_PATH").'pubs/\', pdf) as pdf'
+            'id, title, is_active, category, date_format(published_time, "%Y-%m-%d") as published_time, CONCAT(\''.getenv("PUBLIC_UPLOAD_PATH").'pubs/\', cover) as cover, CONCAT(\''.getenv("PUBLIC_UPLOAD_PATH").'pubs/\', pdf) as pdf'
         )->find($id);
 
         if(is_null($pub)) 
@@ -61,7 +61,7 @@
     <!-- Action buttons -->
     <div class="d-flex flex-row mb-1 ms-auto">
         <a href="<?= base_url('publish/list'); ?>" type="button" class="btn btn-danger ms-1 me-1">Cancel</a>
-        <input type="submit" class="btn btn-success mx-1" value="Save"/>
+        <button type="submit" class="btn btn-success mx-1" id="submit-btn" onclick="javascript:void(0)" value="Save">Save</button>
     </div>
     <?= form_hidden('pub-id', isset($pub) ? $pub['id'] : ''); ?>
     <!-- Publication title -->
@@ -93,18 +93,34 @@
 <?php
     if(get_user_role(session()) == 1)
     {
-        echo view('templates/activation_select', [
+        echo view('templates/select_dropdown', [
             'id' => 'pub-is-active',
             'select_options' => [
                 1 => 'Active',
                 0 => 'Deactivate'
             ],
+            'label' => 'Is Active',
             'active' => (isset($pub) ? $pub['is_active'] : 0),
             'required' => true,
             'comment' => '<!-- Publication Is Active -->'
         ]);
     }
 ?>
+
+<?php
+    echo view('templates/select_dropdown', [
+        'id' => 'pub-category',
+        'select_options' => [
+            'INSP' => 'Inspire',
+            'PAST' => 'Past'
+        ],
+        'label' => 'Publication Category',
+        'active' => (isset($pub) ? $pub['category'] : 'INSP'),
+        'required' => true,
+        'comment' => '<!-- Publication Category -->'
+    ]);
+?>
+
     <!-- Publication Cover -->
     <div class="mb-3">
         <label for="pub-cover" class="form-label">Choose Cover</label>
@@ -147,7 +163,8 @@
                 contentType:false,
                 success: (r) => {
                     if(!r.error) {
-                        toastSuccess('Successfully added!');
+                        $('#submit-btn').prop('disabled', true);
+                        toastSuccess('Successfully added!', true);
                     }
                     else {
                         toastError('Error when saving the publication information!');

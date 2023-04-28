@@ -28,3 +28,4 @@ writable/uploads/*
 public/assets/uploads/*
 
 .vs/*
+build/*

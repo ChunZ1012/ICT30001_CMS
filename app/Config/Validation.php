@@ -134,12 +134,22 @@ class Validation extends BaseConfig
                 'required'
             ]
         ],
+        'pub-category' => [
+            'label' => 'publication category',
+            'rules' => [
+                'required',
+                'in_list[INSP,PAST]'
+            ],
+            'errors' => [
+                'in_list' => 'The value {value} for {field} is not valid!'
+            ]
+        ],
         'pub-cover' => [
             'label' => 'Publication Cover',
             'rules' => [
                 'is_image[pub-cover]',
                 'mime_in[pub-cover,image/png,image/jpeg,image/jpg,image/gif]',
-                'ext_in[pub-cover,.png,.jpeg,.jpg,.gif]',
+                'ext_in[pub-cover,png,jpeg,jpg,gif]',
                 'max_size[pub-cover,5120]',
             ],
             'errors' => [

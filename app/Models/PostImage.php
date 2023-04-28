@@ -51,7 +51,7 @@ class PostImage extends Model
     public function getImages($post_id, $withContent = true, $limit = PHP_INT_MAX)
     {
         $rawSql = new RawSql(
-            'CONCAT(\''.base_url(getenv("PUBLIC_UPLOAD_PATH")).'posts/\', path) as path '.($withContent ? ', id, description, content' : '')
+            'CONCAT(\''.get_posts_public_path().'\', path) as path '.($withContent ? ', id, description, content' : '')
         );
         $postImages = $this->select($rawSql)
             ->where('post_id', $post_id)

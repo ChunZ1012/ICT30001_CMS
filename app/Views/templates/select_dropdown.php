@@ -2,7 +2,7 @@
 <?= '<div class="mb-3">'; ?>
 <?= 
     form_label(
-        "Is Active", "", [
+        $label, "", [
         'class' => 'form-label',
         'for' => $id
     ]);
