@@ -34,7 +34,7 @@ class CreateStaffs extends Migration
             'email' => [
                 'type' => 'varchar',
                 'constraint' => 60,
-                'unique' => true
+                'null' => false
             ],
             'position' => [
                 'type' => 'varchar',

@@ -9,6 +9,6 @@
     "\\app\\Database\\Migrations",
     "\\app\\Database\\Seeds"
   ],
-  "SelectedNode": "\\app\\Database\\Migrations\\2023-04-07-134024_PostImageContent.php",
+  "SelectedNode": "\\app\\Database\\Migrations\\2023-04-08-005220_CreateStaffs.php",
   "PreviewInSolutionExplorer": false
 }

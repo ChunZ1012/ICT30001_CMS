@@ -56,7 +56,7 @@ class StaffSeeder extends Seeder
             'modified_at' => new RawSql('NOW()'),
             'created_by' => 1,
             'modified_by' => 1
-        ];
+        ];        
         $data4 = [
             'image' => 'CongImg.jpg',
             'name' => 'Cong Xing Qiu',
@@ -71,11 +71,119 @@ class StaffSeeder extends Seeder
         ];
         $data5 = [
             'image' => 'ZongImg.jpg',
-            'name' => 'Zong Xing Qiu',
+            'name' => 'Bong Xing Qiu',
             'contact' => '0188495869',
             'email' => 'zong@gmail.com',
             'position' => 'tou',
             'location' => 'jalan.zshi',
+            'created_at' => new RawSql('NOW()'),
+            'modified_at' => new RawSql('NOW()'),
+            'created_by' => 1,
+            'modified_by' => 1
+        ];
+        $data6 = [
+            'image' => 'AongImg.jpg',
+            'name' => 'Aong Xing Qiu',
+            'contact' => '0188495869',
+            'email' => 'Asong@gmail.com',
+            'position' => 'tou',
+            'location' => 'jalan.ashi',
+            'created_at' => new RawSql('NOW()'),
+            'modified_at' => new RawSql('NOW()'),
+            'created_by' => 1,
+            'modified_by' => 1
+        ];
+        $data7 = [
+            'image' => 'AongImg.jpg',
+            'name' => 'Bang Xing Qiu',
+            'contact' => '0188495869',
+            'email' => 'Asogng@gmail.com',
+            'position' => 'tou',
+            'location' => 'jalan.ashi',
+            'created_at' => new RawSql('NOW()'),
+            'modified_at' => new RawSql('NOW()'),
+            'created_by' => 1,
+            'modified_by' => 1
+        ];
+        $data8 = [
+            'image' => 'AongImg.jpg',
+            'name' => 'Bong Xing Qiu',
+            'contact' => '0188495869',
+            'email' => 'Aodng@gmail.com',
+            'position' => 'tou',
+            'location' => 'jalan.ashi',
+            'created_at' => new RawSql('NOW()'),
+            'modified_at' => new RawSql('NOW()'),
+            'created_by' => 1,
+            'modified_by' => 1
+        ];
+        $data9 = [
+            'image' => 'AongImg.jpg',
+            'name' => 'Bong Xing Qiu',
+            'contact' => '0188495869',
+            'email' => 'Aofng@gmail.com',
+            'position' => 'tou',
+            'location' => 'jalan.ashi',
+            'created_at' => new RawSql('NOW()'),
+            'modified_at' => new RawSql('NOW()'),
+            'created_by' => 1,
+            'modified_by' => 1
+        ];
+        $data10 = [
+            'image' => 'AongImg.jpg',
+            'name' => 'Bong Xing Qiu',
+            'contact' => '0188495869',
+            'email' => 'Aodfng@gmail.com',
+            'position' => 'tou',
+            'location' => 'jalan.ashi',
+            'created_at' => new RawSql('NOW()'),
+            'modified_at' => new RawSql('NOW()'),
+            'created_by' => 1,
+            'modified_by' => 1
+        ];
+        $data11 = [
+            'image' => 'AongImg.jpg',
+            'name' => 'Xong Xing Qiu',
+            'contact' => '0188495869',
+            'email' => 'Aoffng@gmail.com',
+            'position' => 'tou',
+            'location' => 'jalan.ashi',
+            'created_at' => new RawSql('NOW()'),
+            'modified_at' => new RawSql('NOW()'),
+            'created_by' => 1,
+            'modified_by' => 1
+        ];
+        $data12 = [
+            'image' => 'AongImg.jpg',
+            'name' => 'Zong Xing Qiu',
+            'contact' => '0188495869',
+            'email' => 'Aonwfg@gmail.com',
+            'position' => 'tou',
+            'location' => 'jalan.ashi',
+            'created_at' => new RawSql('NOW()'),
+            'modified_at' => new RawSql('NOW()'),
+            'created_by' => 1,
+            'modified_by' => 1
+        ];
+        $data13 = [
+            'image' => 'AongImg.jpg',
+            'name' => 'Zong Xing Qiu',
+            'contact' => '0188495869',
+            'email' => 'Aogng@gmail.com',
+            'position' => 'tou',
+            'location' => 'jalan.ashi',
+            'created_at' => new RawSql('NOW()'),
+            'modified_at' => new RawSql('NOW()'),
+            'created_by' => 1,
+            'modified_by' => 1
+        ];
+        $data14 = [
+            'image' => 'ZongImg.jpg',
+            'name' => 'Zonwdg Xing Qiu',
+            'contact' => '018845869',
+            'email' => 'zng@gmail.com',
+            'position' => 'tou',
+            'location' => 'jalan.ashi',
             'created_at' => new RawSql('NOW()'),
             'modified_at' => new RawSql('NOW()'),
             'created_by' => 1,
@@ -88,6 +196,16 @@ class StaffSeeder extends Seeder
         $this->db->table('staffs')->insert($data3);
         $this->db->table('staffs')->insert($data4);
         $this->db->table('staffs')->insert($data5);
+        $this->db->table('staffs')->insert($data6);
+        $this->db->table('staffs')->insert($data7);
+        $this->db->table('staffs')->insert($data8);
+        $this->db->table('staffs')->insert($data9);
+        $this->db->table('staffs')->insert($data10);
+        $this->db->table('staffs')->insert($data11);
+        $this->db->table('staffs')->insert($data12);
+        $this->db->table('staffs')->insert($data13);
+        $this->db->table('staffs')->insert($data14);
+        
     }
 }
     
