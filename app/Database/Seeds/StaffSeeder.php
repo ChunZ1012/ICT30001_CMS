@@ -45,10 +45,49 @@ class StaffSeeder extends Seeder
             'created_by' => 1,
             'modified_by' => 1
         ];
+        $data3 = [
+            'image' => 'AongImg.jpg',
+            'name' => 'Aong Xing Qiu',
+            'contact' => '0188495869',
+            'email' => 'Aong@gmail.com',
+            'position' => 'tou',
+            'location' => 'jalan.ashi',
+            'created_at' => new RawSql('NOW()'),
+            'modified_at' => new RawSql('NOW()'),
+            'created_by' => 1,
+            'modified_by' => 1
+        ];
+        $data4 = [
+            'image' => 'CongImg.jpg',
+            'name' => 'Cong Xing Qiu',
+            'contact' => '0188495869',
+            'email' => 'cong@gmail.com',
+            'position' => 'tou',
+            'location' => 'jalan.cshi',
+            'created_at' => new RawSql('NOW()'),
+            'modified_at' => new RawSql('NOW()'),
+            'created_by' => 1,
+            'modified_by' => 1
+        ];
+        $data5 = [
+            'image' => 'ZongImg.jpg',
+            'name' => 'Zong Xing Qiu',
+            'contact' => '0188495869',
+            'email' => 'zong@gmail.com',
+            'position' => 'tou',
+            'location' => 'jalan.zshi',
+            'created_at' => new RawSql('NOW()'),
+            'modified_at' => new RawSql('NOW()'),
+            'created_by' => 1,
+            'modified_by' => 1
+        ];
 
         $this->db->table('staffs')->insert($data);
         $this->db->table('staffs')->insert($data1);
         $this->db->table('staffs')->insert($data2);
+        $this->db->table('staffs')->insert($data3);
+        $this->db->table('staffs')->insert($data4);
+        $this->db->table('staffs')->insert($data5);
     }
 }
     
