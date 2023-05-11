@@ -133,6 +133,13 @@
             return base_url(getenv("PUBLIC_UPLOAD_PATH")).'posts/';
         }
     }
+    if(!function_exists('get_staff_avatar_public_path'))
+    {
+        function get_staff_avatar_public_path()
+        {
+            return base_url(getenv("PUBLIC_UPLOAD_PATH")).'avatars/';
+        }
+    }
 
     if(!function_exists('get_random_string'))
     {

@@ -28,7 +28,7 @@ class StaffAPIController extends BaseController
             $fromUnity = filter_var($this->request->getHeaderLine('X-Unity-Req'), FILTER_VALIDATE_BOOL);
 
             $staffs = $this->staffModel->select(
-                'id, name, contact, office_contact, office_fax'
+                'id, name, contact, office_contact, office_fax, CONCAT(\''.get_staff_avatar_public_path().'\', avatar) as image'
             )->findAll();
 
             $respData['msg'] = '';

@@ -233,7 +233,7 @@ class Validation extends BaseConfig
                 'uploaded[staff-avatar]',
                 'is_image[staff-avatar]',
                 'mime_in[staff-avatar,image/png,image/jpeg,image/jpg,image/gif]',
-                'ext_in[staff-avatar,.png,.jpeg,.jpg,.gif]'
+                'ext_in[staff-avatar,png,jpeg,jpg,gif]'
             ],
             'errors' => [
                 'uploaded' => 'Failed to upload the file!',
