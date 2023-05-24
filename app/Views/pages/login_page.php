@@ -7,10 +7,10 @@
     {
 ?>
     <script type="text/javascript">
-        window.location.href = '<?= base_url('register');?>';
+        window.location.href = '<?= url_to('register');?>';
     </script>
 <?php 
-    } 
+    }
 ?>
 
 <!doctype html>
@@ -100,7 +100,8 @@
                             toastSuccess('Logging in');
                             $.cookie('<?= $key; ?>', r.msg);
                             setTimeout(() => {
-                                window.location.href = '<?php echo base_url(); ?>'
+                                console.log('<?php echo url_to('home'); ?>')
+                                window.location.href = '<?php echo url_to('home'); ?>'
                             }, 1000);
                         },
                         error:function(r){

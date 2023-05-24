@@ -29,16 +29,16 @@ $routes->set404Override();
 
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
+$routes->get('/login', 'Pages\PageController::login', [ 'as' => 'login' ]);
+$routes->get('/register', 'Pages\PageController::register', [ 'as' => 'register' ]);
 
-$routes->group('/', function($routes) {
+$routes->group('/', ['filter' => 'authRedirect'], function($routes) {
     $routes->get('', 'Pages\PageController::home', [ 'as' => 'home_page' ]);
     // Redirect to Pages\PageController::home
     $routes->addRedirect('home', 'home_page');
     // $routes->get('login', 'Pages\PageController::login');
     // Directly return the desired page to the browser [Treated as GET]
-    $routes->get('login', 'Pages\PageController::login');
     $routes->get('menu', 'Pages\PageController::menu');
-    $routes->get('register', 'Pages\PageController::register');
     // Content
     $routes->group('content', function($routes){
         $routes->get('', 'Pages\PostController::list');

@@ -256,6 +256,11 @@ class PostAPIController extends BaseController
         try
         {
             $post = $this->postModel->find($id);
+            $postImages = $this->postImageModel
+                ->where('post_id', $id)
+                ->get()
+                ->getResultArray($this->postImageModel->returnType);
+
             if(is_null($post)) throw new InvalidArgumentException("The selected post is no longer exist!");
             // Check for user role
             // If the user is not an admin then throw error
@@ -267,7 +272,14 @@ class PostAPIController extends BaseController
                 if(!$r) throw new Exception('Error when deleting the content!');
                 // Update successfully
                 // Set success response message
-                else $respData['msg'] = 'Successfully deleted!';
+                else 
+                {
+                    foreach($postImages as $postImage)
+                    {
+                        delete_uploaded_file($postImage['path'], 'posts');
+                    }
+                    $respData['msg'] = 'Successfully deleted!';
+                }
             }
             else throw new InvalidArgumentException('You do not have permission to delete the content!');
         }
@@ -276,6 +288,7 @@ class PostAPIController extends BaseController
             // Return 500 server error
             $respCode = Response::HTTP_INTERNAL_SERVER_ERROR;
             $respData['msg'] = $e->getMessage();
+            log_message('warning', $e->getTraceAsString());
         }
         // initialize response content
         $p = ['error' => $respCode != Response::HTTP_OK];
