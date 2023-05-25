@@ -50,10 +50,10 @@ const grid = new gridjs.Grid({
             name: "Created At"
         },
         {
-            id: 'page-is-active',
-            name: "Is Active",
+            id: 'page-is-published',
+            name: "Is Published",
             formatter: (cell, row) => {
-                return cell == 1 ? 'Active' : 'Deactivated'
+                return cell == 1 ? 'Published' : 'Unpublish'
             },
             hidden: false,
         },

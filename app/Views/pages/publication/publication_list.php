@@ -54,10 +54,10 @@ const grid = new gridjs.Grid({
             name: "Created At"
         },
         {
-            id: 'pub-is-active',
-            name: "Is Active",
+            id: 'pub-is-publisehd',
+            name: "Is Published",
             formatter: (cell, row) => {
-                return cell == 1 ? 'Active' : 'Deactivated'
+                return cell == 1 ? 'Published' : 'Unpublish'
             },
             hidden: false,
         },

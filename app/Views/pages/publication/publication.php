@@ -96,10 +96,10 @@
         echo view('templates/select_dropdown', [
             'id' => 'pub-is-active',
             'select_options' => [
-                1 => 'Active',
-                0 => 'Deactivate'
+                1 => 'Publish',
+                0 => 'Unpublish'
             ],
-            'label' => 'Is Active',
+            'label' => 'Is Published',
             'active' => (isset($pub) ? $pub['is_active'] : 0),
             'required' => true,
             'comment' => '<!-- Publication Is Active -->'
