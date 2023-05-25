@@ -264,6 +264,12 @@ class Validation extends BaseConfig
                 'is_unique' => 'The email is already existed in the system! Please use a different email!'
             ]
         ],
+        'staff-location' => [
+            'label' => 'staff location',
+            'rules' => [
+                'required'
+            ]
+        ],
         'staff-office-contact' => [
             'label' => 'staff office contact',
             'rules' => [

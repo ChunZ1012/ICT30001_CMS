@@ -54,7 +54,7 @@ class StaffAPIController extends BaseController
         try
         {
             $staff = $this->staffModel->select(
-                'id, name, gender, avatar, contact, email, office_contact, office_fax'
+                'id, name, gender, avatar, contact, email, office_contact, office_fax, location'
             )->find($id);
             // Throw if the staff information is not existed in the db
             if(is_null($staff)) throw new InvalidArgumentException('The selected staff is no longer exist!');
