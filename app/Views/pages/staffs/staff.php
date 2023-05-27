@@ -4,7 +4,7 @@ $is_edit = isset($id) && $id > 0;
 if ($is_edit) {
     $staffModel = new \App\Models\Staff();
     $post = $staffModel->select(
-        'id, name, contact, CONCAT(\''.getenv("PUBLIC_UPLOAD_PATH").'avatars/\', avatar) as avatar, email, age, gender, office_contact, office_fax, IFNULL(location, \'\') as location'
+        'id, name, contact, CONCAT(\''.getenv("PUBLIC_UPLOAD_PATH").'avatars/\', avatar) as avatar, email, age, gender, office_contact, office_fax, IFNULL(location, \'\') as location, IFNULL(position, \'\') as position'
     )->find($id);
 
     if (is_null($post)) {
@@ -108,6 +108,19 @@ window.location.href = '<?=base_url('staff/list');?>';
                 'id' => 'staff-email',
                 'required' => '',
             ], 'email');?>
+            <label class="invalid-feedback"></label>
+        </div>
+        <!-- Staff Position -->
+        <div class="mb-3">
+            <?=form_label('Staff Position', '', [
+                'class' => 'form-label',
+                'for' => 'staff-position',
+            ]);?>
+            <?=form_input('staff-position', isset($post) ? $post['position'] : '', [
+                'class' => 'form-control',
+                'id' => 'staff-position',
+                'required' => ''
+            ], 'text');?>
             <label class="invalid-feedback"></label>
         </div>
          <!-- Staff Location -->

@@ -21,6 +21,8 @@ class Staff extends Model
         'contact',
         'avatar',
         'email',
+        'location',
+        'position',
         'office_contact',
         'office_fax',
         'created_by',

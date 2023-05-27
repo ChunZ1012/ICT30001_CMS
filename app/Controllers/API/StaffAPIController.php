@@ -28,7 +28,7 @@ class StaffAPIController extends BaseController
             $fromUnity = filter_var($this->request->getHeaderLine('X-Unity-Req'), FILTER_VALIDATE_BOOL);
 
             $staffs = $this->staffModel->select(
-                'id, name, contact, office_contact, office_fax, CONCAT(\''.get_staff_avatar_public_path().'\', avatar) as image'
+                'id, name, contact, office_contact, office_fax, CONCAT(\''.get_staff_avatar_public_path().'\', avatar) as image, email, location, position'
             )->findAll();
 
             $respData['msg'] = '';
@@ -54,7 +54,7 @@ class StaffAPIController extends BaseController
         try
         {
             $staff = $this->staffModel->select(
-                'id, name, gender, avatar, contact, email, office_contact, office_fax, location'
+                'id, name, gender, avatar, contact, email, office_contact, office_fax, location, position'
             )->find($id);
             // Throw if the staff information is not existed in the db
             if(is_null($staff)) throw new InvalidArgumentException('The selected staff is no longer exist!');
@@ -103,6 +103,8 @@ class StaffAPIController extends BaseController
                     'gender' => $input['staff-gender'],
                     'contact' => $input['staff-contact'],
                     'email' => $input['staff-email'],
+                    'location' => $input['staff-location'],
+                    'position' => $input['staff-position'],
                     'office_contact' => $input['staff-office-contact'],
                     'office_fax' => $input['staff-office-fax'],
                     'created_by' => get_user_id(session())
@@ -145,6 +147,9 @@ class StaffAPIController extends BaseController
                     'age' => $input['staff-age'],
                     'gender' => $input['staff-gender'],
                     'contact' => $input['staff-contact'],
+                    'email' => $input['staff-email'],
+                    'location' => $input['staff-location'],
+                    'position' => $input['staff-position'],
                     'office_contact' => $input['staff-office-contact'],
                     'office_fax' => $input['staff-office-fax'],
                     'modified_by' => get_user_id(session())

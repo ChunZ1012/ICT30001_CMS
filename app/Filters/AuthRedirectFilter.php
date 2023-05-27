@@ -32,7 +32,7 @@ class AuthRedirectFilter implements FilterInterface
         if(is_null($session))
         {
             log_message('debug', 'session null!');
-            return redirect()->to(url_to('login'), 302)->withHeaders();
+            return redirect()->route('login');
         }
     }
 

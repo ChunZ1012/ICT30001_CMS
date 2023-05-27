@@ -270,6 +270,12 @@ class Validation extends BaseConfig
                 'required'
             ]
         ],
+        'staff-position' => [
+            'label' => 'staff position',
+            'rules' => [
+                'required'
+            ]
+        ],
         'staff-office-contact' => [
             'label' => 'staff office contact',
             'rules' => [
